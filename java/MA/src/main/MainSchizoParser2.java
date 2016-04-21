@@ -31,28 +31,33 @@ public class MainSchizoParser2 {
 		
 			
 		
-			// PART 1 : createAllProbands
-			//parse all single files of cases and controls (dataset 2) -> generate 1 collection file ("!AllProbands.txt")
+			// PART 1 : createAllProbands (2 files: AllCases and AllControls)
+			//parse all single files of cases and controls (dataset 2) -> generate 2 collection files ("!AllProbands.txt")
 			// add information about "diseased = 1 vs 0"
 			if(args[0].equals("createAllProbands")){
 				String pathIn = "";
-				String pathOut = "";
+				//String pathOut = "";
+				String pathOutCase = "";
+				String pathOutControl = "";
 				String pathCases = "";
 				String pathControls = "";
 				if(args.length==1 || args.length==2){ //default files
 					//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
 					pathIn = "/storageNGS/ngs2/projects/exome/schizo_ionTorrent/Analysis/Final/CADD/Swedish_Case_Control/Analysis/";
-					pathOut = path+"!AllProbands.txt";
+					//pathOut = path+"!AllProbands.txt";
+					pathOutCase = path+"!AllCases.txt";
+					pathOutControl = path+"!AllControls.txt";
 					pathCases = path+"case_ids_study.txt";
 					pathControls = path+"control_ids_study.txt";
 				}
 				else {
-					pathOut = path+args[2];
+					//pathOut = path+args[2];
 					pathCases = path+args[3];
 					pathControls = path+args[4];
 				}
 				//parseFiles(path, pathOut,pathCases,pathControls);
-				parseFiles(pathIn, pathOut,pathCases,pathControls);
+				//parseFiles(pathIn, pathOut,pathCases,pathControls);
+				parseFiles(pathIn, pathOutCase, pathOutControl,pathCases,pathControls);
 			}
 
 
@@ -106,6 +111,65 @@ public class MainSchizoParser2 {
 
 	
 	// ---------------------- PART 1 --------------------------------------------	
+
+
+	private static void parseFiles(String path, String pathOutCase, String pathOutControl, String pathCases, String pathControls) {
+		FileOutputWriter writerCase = new FileOutputWriter(pathOutCase);
+		FileOutputWriter writerContr = new FileOutputWriter(pathOutControl);
+		writerCase.write("Id\tDisease\tPhred\tGene\n"); //write header line
+		writerContr.write("Id\tDisease\tPhred\tGene\n");
+		//keep all columns? :
+		//writer.write("#Id\tDisease\tChrom\tPos\tRef\tAlt\tRawScore\tPhred\tFunc\tGene");
+		
+		// read in list of ids for cases and controls
+		FileInputReader readerCase = new FileInputReader(pathCases);
+		FileInputReader readerControl = new FileInputReader(pathControls);
+		String line;
+		// TODO hashset checken... ist dar hier richitge datenstruktur?!??
+		HashSet<String> cases = new HashSet<String>();
+		while((line=readerCase.read())!=null){
+			cases.add(line);
+		}
+		HashSet<String> controls = new HashSet<String>();
+		while((line=readerControl.read())!=null){
+			controls.add(line);
+		}
+		
+		
+		File folder = new File(path);
+		File[] listOfFiles = folder.listFiles();
+		for (File file : listOfFiles) {
+			if (file.isFile()) {
+				// only look at *.withGenes.tsv files...
+				if(file.getName().endsWith(".withGenes.tsv")){
+					String pathIn = path+file.getName();
+					//read patient id from file name
+					String[] a = file.getName().split("\\.");
+					String patientId = a[1];
+					//find correct writer:
+					if(cases.contains(patientId)){
+						parseFile(patientId, pathIn, writerCase, cases, controls);
+					}
+					else if(controls.contains(patientId)){
+						parseFile(patientId, pathIn, writerContr, cases, controls);
+					}
+					else{
+						System.out.println(patientId+ " is no case and no control");
+					}
+
+				}
+				else{
+					System.out.println("Ignore file "+file.getName());
+				}
+			}
+			else{
+				System.out.println("is no file");
+			}
+		}
+		writerCase.closer();
+		writerContr.closer();
+		
+	}
 
 
 	// call "parseFile" for each single file in the directory
