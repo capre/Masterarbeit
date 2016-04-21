@@ -13,7 +13,7 @@ public class MainSchizoParser2 {
 		
 		//specify method: createAllProbands, createMatrixViscovery, or createInputSVM
 		args=new String[1];
-		args[0]="createInputSVM";
+		args[0]="createAllProbands";
 		
 		String path = "";
 		
@@ -22,7 +22,8 @@ public class MainSchizoParser2 {
 		}
 		else{
 			if(args.length==1){ //default path
-				path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
 			}
 			else if(args.length==2){ //set general path
 				path = args[1];
@@ -34,11 +35,13 @@ public class MainSchizoParser2 {
 			//parse all single files of cases and controls (dataset 2) -> generate 1 collection file ("!AllProbands.txt")
 			// add information about "diseased = 1 vs 0"
 			if(args[0].equals("createAllProbands")){
+				String pathIn = "";
 				String pathOut = "";
 				String pathCases = "";
 				String pathControls = "";
 				if(args.length==1 || args.length==2){ //default files
 					//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+					pathIn = "/storageNGS/ngs2/projects/exome/schizo_ionTorrent/Analysis/Final/CADD/Swedish_Case_Control/Analysis/";
 					pathOut = path+"!AllProbands.txt";
 					pathCases = path+"case_ids_study.txt";
 					pathControls = path+"control_ids_study.txt";
@@ -48,7 +51,8 @@ public class MainSchizoParser2 {
 					pathCases = path+args[3];
 					pathControls = path+args[4];
 				}
-				parseFiles(path, pathOut,pathCases,pathControls);
+				//parseFiles(path, pathOut,pathCases,pathControls);
+				parseFiles(pathIn, pathOut,pathCases,pathControls);
 			}
 
 
