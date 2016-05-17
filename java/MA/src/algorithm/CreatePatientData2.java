@@ -22,6 +22,7 @@ public class CreatePatientData2 {
 	}
 
 
+	// list of all genes (sorted) ; NO header
 	private static void readInGenes() {
 		geneList= new ArrayList<String>();
 		String line;
@@ -74,6 +75,9 @@ public class CreatePatientData2 {
 				}
 			}
 		}
+		//write last proband
+		writeLine(actId, actDisease, scores,counter);
+		
 		reader.closer();
 		writer.closer();
 		

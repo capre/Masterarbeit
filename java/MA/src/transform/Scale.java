@@ -1,7 +1,5 @@
 package transform;
 
-import org.omg.Messaging.SyncScopeHelper;
-
 import io.FileInputReader;
 import io.FileOutputWriter;
 
