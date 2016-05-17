@@ -95,7 +95,8 @@ public class MainSchizoParser2 {
 			// +1 diseased (case) vs -1 healthy(control)
 			// (-> feat.scale,feat.name, feat.ids)
 			else if(args[0].equals("createInputSVM")){
-				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
 				
 				//String pathIn = path+"noNorm/!Matrix_scale.txt";
 				//String pathOut = path+"!Matrix_SVM_scale.txt";
