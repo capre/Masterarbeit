@@ -169,7 +169,7 @@ public class MainSchizoParser2 {
 					pathIn = path+args[2];
 					pathOut = path+args[3];
 				}
-				transform.Scale.scaleColumns(pathIn,pathOut+".col");
+				//transform.Scale.scaleColumns(pathIn,pathOut+".col");
 				transform.Scale.scaleRows(pathOut+".col",pathOut);
 				//just scale rows:
 				//transform.Scale.scaleRows(pathIn,pathOut+".row");  

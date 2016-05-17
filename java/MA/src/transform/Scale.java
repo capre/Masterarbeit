@@ -61,6 +61,9 @@ public class Scale {
 			for (int pos=2; pos<l.length; pos++){
 				double n = Double.parseDouble(l[pos]);
 				double z = (n-mean[pos-2])/sd[pos-2];
+				if(Double.isNaN(z)){
+					z=0.0;
+				}
 				writer.write("\t"+z);
 			}
 			writer.write("\n");
@@ -103,6 +106,9 @@ public class Scale {
 			for (int pos=2; pos<l.length; pos++){
 				double n = Double.parseDouble(l[pos]);
 				double z = (n-m)/s;
+				if(Double.isNaN(z)){
+					z=0.0;
+				}
 				writer.write("\t"+z);
 			}
 			writer.write("\n");
