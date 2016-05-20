@@ -25,7 +25,7 @@ public class MainSchizoParser2 {
 		 * 7: mergeViscoveryMatrices
 		 */
 		args=new String[1];
-		args[0]="createInputSVM";
+		args[0]="createGeneList";
 		
 		
 		if(args.length==0){
@@ -67,17 +67,19 @@ public class MainSchizoParser2 {
 			
 			// PART 2 : createMatrixViscovery
 			//parse a list (Id, Disease, Gene, Score) into a matrix as input for viscovery
+			// input file has to consist of "blocks" for each patient = same id in multiple consecutive lines
 			//matrix: patients in rows, disease status in column, genes in columns
 			else if(args[0].equals("createMatrixViscovery")){
-				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
 				
 				//String pathIn = path+"noNorm/!AllProbandsList.txt";
 				//String pathInGenes = path+"noNorm/!GeneList.txt";
 				
-				String pathIn = path+"variants/!AllProbandsList_vars1.5.txt";
-				String pathInGenes = path+"variants/!GeneList_vars1.5.txt";
+				String pathIn = path+"variants_gt/!AllProbands_gt1.5sort.txt";
+				String pathInGenes = path+"variants_gt/!GeneList_gt1.5.txt";
 				
-				String pathOut = path+"!Matrix_vars1.5.txt";
+				String pathOut = path+"variants_gt/!Matrix_gt1.5.txt";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
@@ -100,11 +102,11 @@ public class MainSchizoParser2 {
 				
 				//String pathIn = path+"noNorm/!Matrix_scale.txt";
 				//String pathOut = path+"!Matrix_SVM_scale.txt";
-				String pathIn = path+"variants/!Matrix_withVars1.5_scale.txt";
-				String pathOut = path+"variants/!SVM_vars1.5_scale.txt";
+				String pathIn = path+"variants_gt/!Matrix_withGt1.5_scale.txt";
+				String pathOut = path+"variants_gt/!SVM_withGt1.5_scale.txt";
 				
-				String pathOutGenes = path+"!Matrix_SVM.name";
-				String pathOutIds = path+"!Matrix_SVM.ids";
+				String pathOutGenes = path+"variants_gt/!Matrix_SVM.name";
+				String pathOutIds = path+"variants_gt/!Matrix_SVM.ids";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
@@ -120,10 +122,11 @@ public class MainSchizoParser2 {
 			// PART 4 :createGeneList
 			// generate list of all genes from !AllProbandsList.txt 
 			else if(args[0].equals("createGeneList")){
-				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
 				
-				String pathIn = path+"variants/!AllProbandsList_vars2.0.txt";
-				String pathOut = path+"!GeneList_vars2.0.txt";
+				String pathIn = path+"variants_gt/!AllProbands_gt1.5sort.txt";
+				String pathOut = path+"variants_gt/!GeneList_gt1.5.txt";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
@@ -144,9 +147,9 @@ public class MainSchizoParser2 {
 				//String pathIn = path+"noNorm/!Matrix.txt";
 				String pathIn = path+"noNorm/!Matrix_scale.txt";
 				//String pathOut = path+"noNorm_candGenes/!Matrix_scale_candGenes.txt";
-				String pathOut = path+"noNorm_impGenes/!Matrix_impGenes2.75.txt";
+				String pathOut = path+"noNorm_impGenes/!Matrix_impGenes3.5.txt";
 				//String pathGenes = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/candidateGenes/candidate_genes_uniq.csv";
-				String pathGenes = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/noNorm_impGenes/impGenes2.75.txt";
+				String pathGenes = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/noNorm_impGenes/impGenes3.5.txt";
 				
 				if(args.length>1){ //set files
 					path = args[1];
@@ -161,16 +164,17 @@ public class MainSchizoParser2 {
 			// PART 6 :scaleViscovery
 			// scale a viscovery matrix (z transformation) -> column-wise and/ or row-wise
 			else if(args[0].equals("scaleViscovery")){
-				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
 				
-				String pathIn = path+"variants/!Matrix_withVars1.5.txt";
-				String pathOut = path+"variants/!Matrix_withVars1.5_scale.txt"; 
+				String pathIn = path+"variants_gt/!Matrix_withGt1.5.txt";
+				String pathOut = path+"variants_gt/!Matrix_withGt1.5_scale.txt"; 
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
 					pathOut = path+args[3];
 				}
-				//transform.Scale.scaleColumns(pathIn,pathOut+".col");
+				transform.Scale.scaleColumns(pathIn,pathOut+".col");
 				transform.Scale.scaleRows(pathOut+".col",pathOut);
 				//just scale rows:
 				//transform.Scale.scaleRows(pathIn,pathOut+".row");  
@@ -179,15 +183,16 @@ public class MainSchizoParser2 {
 			
 			
 			// PART 7 :mergeViscoveryMatrices
-			// merge 2 viscovery matrices (same order of ids!?) side by side 
+			// merge 2 viscovery matrices (have to have same order of ids! eg lexicographic) side by side 
 			// 1st and 2nd column (id, disease) of 2nd matrix are skipped
 			// additionally remove genes of a list (NO header) from 1st matrix, if last argument TRUE
 			else if(args[0].equals("mergeViscoveryMatrices")){
-				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
 				
 				String pathFirst = path+"noNorm/!Matrix.txt";
-				String pathSec = path+"variants/!Matrix_vars1.5.txt";
-				String pathOut = path+"!Matrix_withVars1.5.txt"; 
+				String pathSec = path+"variants_gt/!Matrix_gt1.5.txt";
+				String pathOut = path+"variants_gt/!Matrix_withGt1.5.txt"; 
 				String pathGenes = path+ "variants/geneListVariants1.5.txt";
 				if(args.length>1){ //set files
 					path = args[1];
@@ -196,8 +201,8 @@ public class MainSchizoParser2 {
 					pathOut = path+args[4];
 					pathGenes = path+args[5];
 				}
-				mergeMatrices(pathFirst,pathSec,pathOut,pathGenes,true);
-				
+				//mergeMatrices(pathFirst,pathSec,pathOut,pathGenes,true);
+				mergeMatrices(pathFirst,pathSec,pathOut,"",false);
 				
 				
 			
@@ -230,12 +235,12 @@ public class MainSchizoParser2 {
 		while((line=readerCase.read())!=null){
 			cases.add(line);
 		}
-		readerCase.closer(); // damit noch nicht durchgelaufen ... egal?
+		readerCase.closer();
 		HashSet<String> controls = new HashSet<String>();
 		while((line=readerControl.read())!=null){
 			controls.add(line);
 		}
-		readerControl.closer(); // damit noch nicht durchgelaufen ... egal?
+		readerControl.closer();
 		
 		
 		File folder = new File(path);
@@ -289,12 +294,12 @@ public class MainSchizoParser2 {
 		while((line=readerCase.read())!=null){
 			cases.add(line);
 		}
-		readerCase.closer(); // damit noch nicht durchgelaufen ... egal?
+		readerCase.closer(); 
 		HashSet<String> controls = new HashSet<String>();
 		while((line=readerControl.read())!=null){
 			controls.add(line);
 		}
-		readerControl.closer(); // damit noch nicht durchgelaufen ... egal?
+		readerControl.closer();
 		
 		
 		File folder = new File(path);
@@ -377,12 +382,12 @@ public class MainSchizoParser2 {
 			String[] l = line.split("\t");
 			writerIds.write(l[0]+"\n"); //write ids
 			//disease status
-			if(l[1].equals("1")){ // diseased (case)
+			if(l[1].equals("1") | l[1].equals("+1")){ // diseased (case)
 				writer.write("+1");
 			}
-			else if(l[1].equals("0")){ // healthy (control)
+			else if(l[1].equals("0")| l[1].equals("-1")){ // healthy (control)
 				writer.write("-1");
-			}else{System.out.println(line);}
+			}else{System.out.println("wrong class in: "+line);}
 			 
 			for(int col = 2; col<l.length; col++) {
 				writer.write(" "+(col-1)+":"+l[col]);
