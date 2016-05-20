@@ -25,7 +25,7 @@ public class MainSchizoParser2 {
 		 * 7: mergeViscoveryMatrices
 		 */
 		args=new String[1];
-		args[0]="createGeneList";
+		args[0]="createInputSVM";
 		
 		
 		if(args.length==0){
@@ -174,7 +174,7 @@ public class MainSchizoParser2 {
 					pathIn = path+args[2];
 					pathOut = path+args[3];
 				}
-				transform.Scale.scaleColumns(pathIn,pathOut+".col");
+				//transform.Scale.scaleColumns(pathIn,pathOut+".col");
 				transform.Scale.scaleRows(pathOut+".col",pathOut);
 				//just scale rows:
 				//transform.Scale.scaleRows(pathIn,pathOut+".row");  
@@ -520,8 +520,8 @@ public class MainSchizoParser2 {
 			}
 		}
 		else{ // no genes should be removed
-			for(boolean b : keep1){
-				b = true;
+			for(int pos = 0; pos<keep1.length; pos++){
+				keep1[pos] = true;
 			}
 		}
 		
