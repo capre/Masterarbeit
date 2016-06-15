@@ -25,7 +25,7 @@ public class MainSchizoParser2 {
 		 * 7: mergeViscoveryMatrices
 		 */
 		args=new String[1];
-		args[0]="createInputSVM";
+		args[0]="createGeneList";
 		
 		
 		if(args.length==0){
@@ -123,10 +123,11 @@ public class MainSchizoParser2 {
 			// generate list of all genes from !AllProbandsList.txt 
 			else if(args[0].equals("createGeneList")){
 				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
-				String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
+				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
+				String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 				
-				String pathIn = path+"variants_gt/!AllProbands_gt1.5sort.txt";
-				String pathOut = path+"variants_gt/!GeneList_gt1.5.txt";
+				String pathIn = path+"gt_all/!AllProbands_gtsort.txt";
+				String pathOut = path+"gt_all/!GeneList_gt.txt";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
