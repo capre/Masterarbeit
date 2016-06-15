@@ -97,16 +97,16 @@ public class MainSchizoParser2 {
 			// +1 diseased (case) vs -1 healthy(control)
 			// (-> feat.scale,feat.name, feat.ids)
 			else if(args[0].equals("createInputSVM")){
-				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
-				String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
+				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
 				
 				//String pathIn = path+"noNorm/!Matrix_scale.txt";
 				//String pathOut = path+"!Matrix_SVM_scale.txt";
-				String pathIn = path+"variants_gt/!Matrix_withGt1.5_scale.txt";
-				String pathOut = path+"variants_gt/!SVM_withGt1.5_scale.txt";
+				String pathIn = path+"variants_gt/!Matrix_gt1.5_scale.txt";
+				String pathOut = path+"variants_gt/!SVM_gt1.5_scale.txt";
 				
-				String pathOutGenes = path+"variants_gt/!Matrix_SVM.name";
-				String pathOutIds = path+"variants_gt/!Matrix_SVM.ids";
+				String pathOutGenes = path+"variants_gt/!SVM_gt1.5.name";
+				String pathOutIds = path+"variants_gt/!SVM_gt1.5.ids";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
@@ -164,17 +164,17 @@ public class MainSchizoParser2 {
 			// PART 6 :scaleViscovery
 			// scale a viscovery matrix (z transformation) -> column-wise and/ or row-wise
 			else if(args[0].equals("scaleViscovery")){
-				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
-				String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
+				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
 				
-				String pathIn = path+"variants_gt/!Matrix_withGt1.5.txt";
-				String pathOut = path+"variants_gt/!Matrix_withGt1.5_scale.txt"; 
+				String pathIn = path+"variants_gt/!Matrix_gt1.5.txt";
+				String pathOut = path+"variants_gt/!Matrix_gt1.5_scale.txt"; 
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
 					pathOut = path+args[3];
 				}
-				//transform.Scale.scaleColumns(pathIn,pathOut+".col");
+				transform.Scale.scaleColumns(pathIn,pathOut+".col");
 				transform.Scale.scaleRows(pathOut+".col",pathOut);
 				//just scale rows:
 				//transform.Scale.scaleRows(pathIn,pathOut+".row");  
