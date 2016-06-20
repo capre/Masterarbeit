@@ -25,7 +25,7 @@ public class MainSchizoParser2 {
 		 * 7: mergeViscoveryMatrices
 		 */
 		args=new String[1];
-		args[0]="createGeneList";
+		args[0]="createMatrixViscovery";
 		
 		
 		if(args.length==0){
@@ -71,15 +71,16 @@ public class MainSchizoParser2 {
 			//matrix: patients in rows, disease status in column, genes in columns
 			else if(args[0].equals("createMatrixViscovery")){
 				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
-				String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
+				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
+				String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 				
 				//String pathIn = path+"noNorm/!AllProbandsList.txt";
 				//String pathInGenes = path+"noNorm/!GeneList.txt";
 				
-				String pathIn = path+"variants_gt/!AllProbands_gt1.5sort.txt";
-				String pathInGenes = path+"variants_gt/!GeneList_gt1.5.txt";
+				String pathIn = path+"gt_all/!AllProbands_gt_part.txt";
+				String pathInGenes = path+"gt_all/!GeneList_gt_part.txt";
 				
-				String pathOut = path+"variants_gt/!Matrix_gt1.5.txt";
+				String pathOut = path+"gt_all/!Matrix_gt.txt";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
@@ -126,8 +127,8 @@ public class MainSchizoParser2 {
 				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
 				String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 				
-				String pathIn = path+"gt_all/!AllProbands_gtsort.txt";
-				String pathOut = path+"gt_all/!GeneList_gt.txt";
+				String pathIn = path+"gt_all/!AllProbands_gt_part.txt";
+				String pathOut = path+"gt_all/!GeneList_gt_part.txt";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
