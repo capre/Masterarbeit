@@ -25,7 +25,7 @@ public class MainSchizoParser2 {
 		 * 7: mergeViscoveryMatrices
 		 */
 		args=new String[1];
-		args[0]="createMatrixViscovery";
+		args[0]="createInputSVM";
 		
 		
 		if(args.length==0){
@@ -98,16 +98,17 @@ public class MainSchizoParser2 {
 			// +1 diseased (case) vs -1 healthy(control)
 			// (-> feat.scale,feat.name, feat.ids)
 			else if(args[0].equals("createInputSVM")){
-				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
 				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
+				String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 				
 				//String pathIn = path+"noNorm/!Matrix_scale.txt";
 				//String pathOut = path+"!Matrix_SVM_scale.txt";
-				String pathIn = path+"variants_gt/!Matrix_gt1.5_scale.txt";
-				String pathOut = path+"variants_gt/!SVM_gt1.5_scale.txt";
+				String pathIn = path+"gt_all/!Matrix_gt.txt";
+				String pathOut = path+"gt_all/!SVM_gt.txt";
 				
-				String pathOutGenes = path+"variants_gt/!SVM_gt1.5.name";
-				String pathOutIds = path+"variants_gt/!SVM_gt1.5.ids";
+				String pathOutGenes = path+"gt_all/!SVM_gt.name";
+				String pathOutIds = path+"gt_all/!SVM_gtq.ids";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
@@ -166,11 +167,12 @@ public class MainSchizoParser2 {
 			// PART 6 :scaleViscovery
 			// scale a viscovery matrix (z transformation) -> column-wise and/ or row-wise
 			else if(args[0].equals("scaleViscovery")){
-				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
 				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
+				String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 				
-				String pathIn = path+"variants_gt/!Matrix_gt1.5.txt";
-				String pathOut = path+"variants_gt/!Matrix_gt1.5_scale.txt"; 
+				String pathIn = path+"gt_all/!Matrix_gt.txt";
+				String pathOut = path+"gt_all/!Matrix_gt_scale.txt"; 
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
