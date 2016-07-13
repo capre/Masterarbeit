@@ -25,7 +25,7 @@ public class MainSchizoParser2 {
 		 * 7: mergeViscoveryMatrices
 		 */
 		args=new String[1];
-		args[0]="createInputSVM";
+		args[0]="";
 		
 		
 		if(args.length==0){
@@ -108,7 +108,7 @@ public class MainSchizoParser2 {
 				String pathOut = path+"gt_all/!SVM_gt.txt";
 				
 				String pathOutGenes = path+"gt_all/!SVM_gt.name";
-				String pathOutIds = path+"gt_all/!SVM_gtq.ids";
+				String pathOutIds = path+"gt_all/!SVM_gt.ids";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
