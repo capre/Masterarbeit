@@ -1,10 +1,13 @@
 package profiles;
 
+import io.ByteLine;
 import io.ByteReader;
 import io.FileInputReader;
 import io.FileOutputWriter;
 
 import java.util.HashSet;
+
+import org.omg.Messaging.SyncScopeHelper;
 
 public class ProfileGenerator {
 	
@@ -16,7 +19,7 @@ public class ProfileGenerator {
 	
 	
 	
-	// static init method -> save file names; generate file readers ? 
+	// static run method 
 	public static void run(String geneList, String mapIn, String termIn, String weightIn, 
 			String mapOut, String termOut, String weigthOut, String infoOut){
 		
@@ -27,11 +30,10 @@ public class ProfileGenerator {
 		filterMap(mapIn, mapOut); //ok
 		
 		//filter .term (1st column) + get row-indices (0-based), which rows are kept -> for matrix filtering
-		filterTerm(termIn, termOut, infoOut); //TODO testen
+		filterTerm(termIn, termOut, infoOut); //ok
 		
-		
-		//read .weight -> translate it 
-		readWeight(weightIn, weigthOut);
+		//read .weight -> translate it read (keeping original row indices!!!)//TODO
+		filterWeight(weightIn, weigthOut);
 		
 
 		
@@ -82,7 +84,7 @@ public class ProfileGenerator {
 	
 	// durch .term laufen: falls es die 1.Spalte im TermSet gibt:
 	// -> Zeile rausschreiben 
-	// -> row number (0-based) auch rauschreiben/speichern (damit man weiß, was behalten wurde) -> wichtig fuer matrix filtering!
+	// -> row number (0-based) auch rauschreiben/speichern (damit man weiss, was behalten wurde) -> wichtig fuer matrix filtering!
 	private static void filterTerm(String termIn, String termOut, String infoOut) {
 		FileInputReader reader = new FileInputReader(termIn);
 		FileOutputWriter writerTerm = new FileOutputWriter(termOut);
@@ -107,25 +109,38 @@ public class ProfileGenerator {
 	}
 	
 	
-	// read .weigth file and try to translate it ...
-	private static void readWeight(String weightIn, String weigthOut){
+	// read .weigth file, filter it (keeping original row indices!!!) and translate it ...
+	private static void filterWeight(String weightIn, String weigthOut){
 		ByteReader reader = new ByteReader(weightIn);
 		FileOutputWriter writer = new FileOutputWriter(weigthOut);
-		
-		
-		
+
 		writer.write("reading .weigth\n");
+		// 3 int numbers: Zahl der Spalten (88536); Zahl der Zeilen (88536); Zahl der sparse elements (15213762)
+		for (int n=1; n<=3; n++){
+			int i = reader.readInt();
+			writer.write(i+"\t");
+		}
+		writer.write("\n");
+		
+		// read all "lines" in file:
+		int number; // get length of line, or -1 if file is completely read
+		while((number = reader.readInt())!=-1){
+			ByteLine bl = reader.readElements(number);
+			int[] ind = bl.getIndices();
+			float[] val = bl.getValues();
+			writer.write(bl.getSize()+"\t");
+			for(int pos=0; pos<bl.getSize(); pos++){
+				writer.write(ind[pos]+":"+val[pos]+"\t");
+			}
+			writer.write("\n");
+		}
 		
 		
+
 		
-		
-		
-		
-		
+
 		
 		writer.closer();
-		
-		
 	}
 	
 	
