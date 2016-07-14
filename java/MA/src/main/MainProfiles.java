@@ -20,10 +20,11 @@ public class MainProfiles {
 		//output:
 		String mapOut = path+"dbset_filtered.map";
 		String termOut = path+"dbset_filtered.term";
-		String weigthOut = path+"dbset_filtered_originalIndex.weigth"; // keeping original row indices!!!
+		String weigthOut = path+"dbset_filtered.weigth";
+		String geneListProfiles = path+"GeneListProfiles.txt";
 		String infoOut = path+"rows_kept.info";
 		
-		ProfileGenerator.run(geneList,mapIn,termIn,weightIn, mapOut,termOut,weigthOut,infoOut);
+		ProfileGenerator.run(geneList,mapIn,termIn,weightIn, mapOut,termOut,weigthOut,geneListProfiles,infoOut);
 		
 		
 		
