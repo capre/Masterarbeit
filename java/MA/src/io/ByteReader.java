@@ -82,8 +82,8 @@ public class ByteReader {
 
 
 	// read one line = read "number" elements (int index + float value) and return a ByteLine object
-	public ByteLine readElements(int number) {
-		ByteLine bl = new ByteLine(number);
+	public ByteLine readElements(int number, String gene) {
+		ByteLine bl = new ByteLine(number, gene);
 		
 		for(int c=1; c<=number; c++){
 			int i = this.readInt();

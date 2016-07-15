@@ -7,21 +7,24 @@ import io.FileOutputWriter;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 public class ProfileGenerator {
 	
-	//static variables:
+	
 	private static HashSet<String> geneSet;
 	private static HashMap<String, String> term2gene;
-	private static HashMap<Integer, String> old_indices;
-	private static HashMap<String, Integer> new_indices;
+	private static HashMap<Integer, String> index2term;
+	private static HashMap<Integer, String> old_indices; // original_index --> Gene
+	private static HashMap<String, Integer> new_indices; // Gene --> new, shifted index (only used for index_shift in case of column-filtering)
+	private static LinkedList<ByteLine> lines;
 	
 	
 	
 	// static run method 
 	// aufruf: (geneList,mapIn,termIn,weightIn, mapOut,termOut,weigthOut,geneListProfiles,infoOut);
 	public static void run(String geneList, String mapIn, String termIn, String weightIn, 
-			String mapOut, String termOut, String weigthOut, String geneListProfiles, String infoOut){
+			String mapOut, String termOut, String weigthOut, String weigthOutComplete, String geneListProfiles, String infoOut){
 		
 		//read in list of genes -> genes to keep in filtering
 		readGenes(geneList); //ok
@@ -32,9 +35,11 @@ public class ProfileGenerator {
 		//filter .term (1st column) + get row-indices (0-based), which rows are kept -> for matrix filtering
 		filterTerm(termIn, termOut, infoOut); //ok
 		
-		//read .weight -> translate it and filter it
+		//read .weight -> translate it and filter it (filter only rows; keep all columns, keep indices = no shift of indices necessary)
 		filterWeight(weightIn, weigthOut, geneListProfiles);
 		
+		//
+		createCompleteMatrix(weigthOutComplete);
 
 		
 	}
@@ -42,8 +47,7 @@ public class ProfileGenerator {
 	//-----------------------------------------------------------------------
 
 
-
-	//read in list of genes -> genes to keep in filtering
+	//read in list of genes -> genes to keep in filtering (keep these rows)
 	private static void readGenes(String pathGeneList) {
 		FileInputReader reader = new FileInputReader(pathGeneList);
 		String line;
@@ -86,13 +90,14 @@ public class ProfileGenerator {
 	// -> Zeile rausschreiben 
 	// -> row number (0-based) auch rauschreiben/speichern (damit man weiss, was behalten wurde) 
 	//		= old index! (-> wichtig fuer matrix filtering!)
-	//		auch gleich new_indices aufbauen
+	//		auch gleich new_indices aufbauen // braucht man nur fuer spalten filtern...
 	private static void filterTerm(String termIn, String termOut, String infoOut) {
 		FileInputReader reader = new FileInputReader(termIn);
 		FileOutputWriter writerTerm = new FileOutputWriter(termOut);
 		FileOutputWriter writerRows = new FileOutputWriter(infoOut);
 		String line;
 		
+		index2term = new HashMap<Integer, String>();
 		old_indices = new HashMap<Integer, String>();
 		new_indices = new HashMap<String, Integer>();
 		int oldIndex = 0;
@@ -100,6 +105,8 @@ public class ProfileGenerator {
 		
 		while((line=reader.read())!=null){ // 2p24    8.910131
 			String[] l = line.split("\t");
+			index2term.put(oldIndex, l[0]);
+			
 			if(term2gene.containsKey(l[0])){
 				writerTerm.write(line+"\n");
 				writerRows.write(oldIndex+"\n");
@@ -117,11 +124,13 @@ public class ProfileGenerator {
 	}
 	
 	
-	// read .weight file, translate it, and filter it
+	// read .weight file, translate it, and filter it (filter only rows!)
+	// kept ByteLines ---> LinkedList lines
 	private static void filterWeight(String weightIn, String weigthOut, String geneListProfiles){
 		ByteReader reader = new ByteReader(weightIn);
 		FileOutputWriter writer = new FileOutputWriter(weigthOut);
-		FileOutputWriter writerGenes = new FileOutputWriter(geneListProfiles);
+		//FileOutputWriter writerGenes = new FileOutputWriter(geneListProfiles);
+		lines = new LinkedList<ByteLine>();
 
 		// 3 int numbers: Zahl der Spalten (88536); Zahl der Zeilen (88536); Zahl der sparse elements (15213762)
 		for (int n=1; n<=3; n++){
@@ -134,13 +143,17 @@ public class ProfileGenerator {
 		int row = 0;
 		int number; // get length of line, or -1 if file is completely read
 		while((number = reader.readInt())!=-1){
-			ByteLine bl = reader.readElements(number);
+			
+			String gene =old_indices.get(row);
+			ByteLine bl = reader.readElements(number, gene);
 			//bl.write(writer);	//write all ByteLines (unfiltered)
 			
 			//filtering (write only filtered ByteLines):
-			// if line has to be kept (row contained in old_indices): 
-			// filter this ByteLine (adjust indices) and write it
+			// if line has to be kept (row contained in old_indices): keep line OR 
+			// filter this ByteLine for columns (adjust indices) before writing
 			if(old_indices.containsKey(row)){
+				/*
+				 * for filtering columns:
 				ByteLine blFiltered = bl.filter(old_indices, new_indices);
 				blFiltered.write(writer);
 				
@@ -149,15 +162,41 @@ public class ProfileGenerator {
 				int oldInd = row;
 				int newInd = new_indices.get(gene);
 				writerGenes.write(gene+"\t"+oldInd+"\t"+newInd+"\n");
+				*/
+				
+				bl.write(writer);
+				lines.add(bl);
 				
 			}
 			row++;
 		}
 		writer.closer();
-		writerGenes.closer();
+		//writerGenes.closer();
 	}
 	
 	
+	
+	// create complete matrix from ByteLine list (fill with "0"); keep 0-columns
+	// TODO add header and first column of gene names
+	private static void createCompleteMatrix(String weigthOutComplete) {
+		FileOutputWriter writer = new FileOutputWriter(weigthOutComplete);
+		int n = 88536; // number of columns (= number of terms)
+		
+		//write header
+		writer.write("Gene");
+		for (int pos=0; pos<n; pos++){
+			writer.write("\t"+index2term.get(pos));
+		}
+		writer.write("\n");
+		
+		int row = 0;
+		// write matrix:
+		for (ByteLine bl : lines) {
+			writer.write(bl.getGene()+"\t");
+            bl.writeComplete(writer, n);
+        }
+		writer.closer();
+	}
 	
 	
 }

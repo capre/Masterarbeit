@@ -2,42 +2,26 @@ package io;
 
 import java.util.HashMap;
 
-// getestet in profileGenerator mit :
-/*
- * 		io.ByteLine bl = new io.ByteLine(2);
-		int i1 = 0;
-		float f1 = (float) 0.04407013;
-		int i2 = 12;
-		float f2 = (float) 0.0011428349;
-		
-		bl.addElement(i1, f1);
-		bl.addElement(i2, f2);
-		
-		int[] ind = bl.getIndices();
-		System.out.println(ind[1]);
-		
-		float[] val= bl.getValues();
-		System.out.println(val[1]);
- */
-
 public class ByteLine {
 	
 	private int size;
 	private int[] indices;
 	private float[] values;
 	private int counter;	// counts position in arrays (next free array fields to be filled)
+	private String gene;
 	
 	
 	// create new Line object (line contains "size" elements)
-	public ByteLine(int size){
+	public ByteLine(int size, String gene){
 		this.size = size;
 		this.indices = new int[size];
 		this.values = new float[size];
 		this.counter = 0;
+		this.gene = gene;
 	}
 	
 
-	// getter for arrays and size
+	// getter
 	public int[] getIndices() {
 		return indices;
 	}
@@ -46,6 +30,9 @@ public class ByteLine {
 	}
 	public int getSize() {
 		return size;
+	}
+	public String getGene() {
+		return gene;
 	}
 	
 	// add one element consisting of index and value (add to arrays)
@@ -73,6 +60,34 @@ public class ByteLine {
 	
 	
 	
+	// write "complete" ByteLine to a file (using the given writer); fill non-existing values with "0" (also keep 0-columns)
+	// overall "n" columns in complete line
+	// format (tab-separated): size, values 
+	public void writeComplete(FileOutputWriter writer, int n) {
+		writer.write(size+"");
+		int indexComplete = 0;
+		for(int pos=0; pos<size; pos++){
+			
+			// replace non-existing values with 0
+			while(indices[pos]!=indexComplete){
+				writer.write("\t0");
+				indexComplete++;
+			}
+			writer.write("\t"+values[pos]);
+			indexComplete++;
+		}
+		
+		// fill with "0" up to end of line
+		while(indexComplete<n){
+			writer.write("\t0");
+			indexComplete++;
+		}
+		
+		writer.write("\n");
+	}
+	
+	
+	
 	
 	//filter line: keep only indices contained in old_indices (keys)
 	// return new (filtered) ByteLine object with new, adjusted indices
@@ -86,7 +101,7 @@ public class ByteLine {
 		}
 		
 		//create new (filtered) ByteLine object
-		ByteLine blFiltered = new ByteLine(s);
+		ByteLine blFiltered = new ByteLine(s, this.gene);
 		for (int pos=0; pos<this.size; pos++){
 			if(old_indices.containsKey(this.indices[pos])){
 				// get new index: oldIndex -> gene -> newIndex:
