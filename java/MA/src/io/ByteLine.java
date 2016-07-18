@@ -1,6 +1,8 @@
 package io;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 public class ByteLine {
 	
@@ -117,6 +119,51 @@ public class ByteLine {
 
 
 
+	//merge 2 ByteLines: return a ByteLine object containing average values for each feature (works)
+	public ByteLine merge(ByteLine bl2) {
+		
+		// get size of new ByteLine: count all indices
+		TreeSet<Integer> ind = new TreeSet<Integer>();
+		for (int pos=0; pos<this.size; pos++){
+			ind.add(indices[pos]);
+		}
+		for (int pos=0; pos<bl2.getSize(); pos++){
+			ind.add(bl2.getIndices()[pos]);
+		}
+		int s = ind.size();
+		
+		ByteLine bl_new = new ByteLine(s, this.gene);
+		// check, if genes are the same
+		if(!this.gene.equals(bl2.getGene())){
+			System.out.println("Warning: you merge lines with two different genes: "+this.gene+" and "+bl2.getGene());
+		}
+		
+		// create new arrays
+		int pos1 = 0;
+		int pos2 = 0;
+		for (int i: ind){
+			if(pos1<this.size && pos2<bl2.getSize() && this.indices[pos1]==i && bl2.getIndices()[pos2]==i){
+				// calc average of values
+				float f = (this.values[pos1]+bl2.getValues()[pos2])/2;
+				bl_new.addElement(i, f);
+				pos1++;
+				pos2++;
+			}
+			else if(pos1<this.size && this.indices[pos1]==i){
+				bl_new.addElement(this.indices[pos1], this.values[pos1]);
+				pos1++;
+			}
+			else if(pos2<bl2.getSize() && bl2.getIndices()[pos2]==i){
+				bl_new.addElement(bl2.getIndices()[pos2], bl2.getValues()[pos2]);
+				pos2++;
+			}
+			else{
+				System.out.print("Something went wrong: this index does not exist in bl1 or bl2.");
+			}	
+		}
+		
+		return bl_new;
+	}
 	
 
 	

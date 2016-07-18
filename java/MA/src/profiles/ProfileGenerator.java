@@ -8,6 +8,7 @@ import io.FileOutputWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.TreeSet;
 
 public class ProfileGenerator {
 	
@@ -21,11 +22,14 @@ public class ProfileGenerator {
 	
 	
 	
-	// static run method 
-	// aufruf: (geneList,mapIn,termIn,weightIn, mapOut,termOut,weigthOut,geneListProfiles,infoOut);
+	// run method 
+	// aufruf: ProfileGenerator.run(geneList,mapIn,termIn,weightIn, mapOut,termOut,weigthOut,weigthOutComplete,geneListProfiles,infoOut);
 	public static void run(String geneList, String mapIn, String termIn, String weightIn, 
 			String mapOut, String termOut, String weigthOut, String weigthOutComplete, String geneListProfiles, String infoOut){
+
 		
+	
+		/*
 		//read in list of genes -> genes to keep in filtering
 		readGenes(geneList); //ok
 		
@@ -38,10 +42,10 @@ public class ProfileGenerator {
 		//read .weight -> translate it and filter it (filter only rows; keep all columns, keep indices = no shift of indices necessary)
 		filterWeight(weightIn, weigthOut, geneListProfiles);
 		
-		//
+		//create complete matrix (non-existing values -> 0) a la viscovery format
+		//gene, number of non-0-elements, list of values for features
 		createCompleteMatrix(weigthOutComplete);
-
-		
+		*/
 	}
 
 	//-----------------------------------------------------------------------
@@ -167,6 +171,26 @@ public class ProfileGenerator {
 				bl.write(writer);
 				lines.add(bl);
 				
+				
+				/*
+				//TODO checken, ob lines mit gleichem gen gelich sind:
+				if(row==16084|| row ==23066){
+					int[] i = bl.getIndices();
+					float[] f = bl.getValues();
+					for(int pos=0; pos<bl.getSize(); pos++){
+						System.out.print("\t"+i[pos]+":"+f[pos]);
+						
+						// for plotting: write only values
+						//writer.write("\t"+values[pos]);
+						//writer.write(values[pos]+"\n"); // one value per line -> distribution?!
+					}
+					System.out.print("\n");
+				}
+				*/
+				
+				
+				
+				
 			}
 			row++;
 		}
@@ -177,24 +201,45 @@ public class ProfileGenerator {
 	
 	
 	// create complete matrix from ByteLine list (fill with "0"); keep 0-columns
-	// TODO add header and first column of gene names
 	private static void createCompleteMatrix(String weigthOutComplete) {
 		FileOutputWriter writer = new FileOutputWriter(weigthOutComplete);
 		int n = 88536; // number of columns (= number of terms)
 		
+		HashSet<String> uniqTerms = new HashSet<String>(); // after char replacement, some terms end up being identical -> add "_" to end
+	 	
 		//write header
-		writer.write("Gene");
+		// Replace non-alphanumeric characters -> "", " "->"_"
+		writer.write("Gene\tnon0elements");
 		for (int pos=0; pos<n; pos++){
-			writer.write("\t"+index2term.get(pos));
+			String t = index2term.get(pos);
+			t = t.replaceAll(" |-", "_");		
+			t = t.replaceAll("[^A-Za-z0-9_]", "");
+			// test, if term is still unique
+			if(uniqTerms.contains(t)){
+				t = t+"_";
+
+			}
+			uniqTerms.add(t);
+			writer.write("\t"+t);	
 		}
+		
 		writer.write("\n");
 		
-		int row = 0;
 		// write matrix:
+		// check, if Gene is unique (otherwise add "_" to end)
+		HashSet<String> uniqGenes = new HashSet<String>();
 		for (ByteLine bl : lines) {
-			writer.write(bl.getGene()+"\t");
+			
+			String g = bl.getGene();
+			if(uniqGenes.contains(g)){
+				g = g+"_";
+			}
+			uniqGenes.add(g);
+			
+			writer.write(g+"\t");
             bl.writeComplete(writer, n);
         }
+        
 		writer.closer();
 	}
 	
