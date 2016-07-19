@@ -1,7 +1,7 @@
 package io;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.TreeSet;
 
 public class ByteLine {
@@ -64,9 +64,8 @@ public class ByteLine {
 	
 	// write "complete" ByteLine to a file (using the given writer); fill non-existing values with "0" (also keep 0-columns)
 	// overall "n" columns in complete line
-	// format (tab-separated): size, values 
+	// format (tab-separated): values  (line begins with tab!)
 	public void writeComplete(FileOutputWriter writer, int n) {
-		writer.write(size+"");
 		int indexComplete = 0;
 		for(int pos=0; pos<size; pos++){
 			
@@ -166,9 +165,28 @@ public class ByteLine {
 	}
 	
 
-	
-	
-	
+	// gets list of ByteLine objects, and number of columns for output (n)
+	// calculates sums of values for each feature
+	// returns ByteLine object containing the sums
+	public static ByteLine sumFeatureValues(LinkedList<ByteLine> lines, int n) {
+		ByteLine bl_sum = new ByteLine(n, "");
+		
+		float[] valSum = new float[n]; // array to sum up values for features
+		
+		//jede ByteLine abarbeiten, und werte fuer features jeweils in array hinzuaddieren
+		for (ByteLine bl : lines){
+			for(int pos=0; pos<bl.getSize(); pos++){
+				valSum[bl.getIndices()[pos]] += bl.getValues()[pos];
+			}
+		}
+		
+		// neue ByteLine aufbauen
+		for(int pos=0; pos<n; pos++){
+			bl_sum.addElement(pos, valSum[pos]);
+		}
+		
+		return bl_sum;
+	}
 	
 	
 	

@@ -8,10 +8,8 @@ import io.FileOutputWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.TreeSet;
 
 public class ProfileGenerator {
-	
 	
 	private static HashSet<String> geneSet;
 	private static HashMap<String, String> term2gene;
@@ -19,17 +17,61 @@ public class ProfileGenerator {
 	private static HashMap<Integer, String> old_indices; // original_index --> Gene
 	private static HashMap<String, Integer> new_indices; // Gene --> new, shifted index (only used for index_shift in case of column-filtering)
 	private static LinkedList<ByteLine> lines;
+	/* sizes: 
+	System.out.println(geneSet.size());		//20890		
+	System.out.println(term2gene.size());	//12330
+	System.out.println(index2term.size());	//88536 	= number of columns (= number of terms)
+	System.out.println(old_indices.size());	// 9744		= number of rows after filtering
+	System.out.println(new_indices.size());	// 9722 	(22 genes occur twice as they have two terms assigned...)
+	System.out.println(lines.size());		// 9744		= number of rows after filtering
+	*/
 	
-	
-	
+	/*
 	// run method 
-	// aufruf: ProfileGenerator.run(geneList,mapIn,termIn,weightIn, mapOut,termOut,weigthOut,weigthOutComplete,geneListProfiles,infoOut);
+	aufruf: ProfileGenerator.run(geneList,mapIn,termIn,weightIn, 
+			mapOut,termOut,weigthOut,weigthOutComplete,geneListProfiles,infoOut,clusterMatrix);
+	*/
 	public static void run(String geneList, String mapIn, String termIn, String weightIn, 
-			String mapOut, String termOut, String weigthOut, String weigthOutComplete, String geneListProfiles, String infoOut){
+			String mapOut, String termOut, String weigthOut, String weigthOutComplete, String geneListProfiles, String infoOut, String clusterMatrix){
 
+		/*
+		//for testing
+		ByteLine bl1 = new ByteLine(3, "AB0");
+		int i1 = 1;
+		int i2 = 3;
+		int i3 = 10;
+		float f1 = (float) 1;
+		float f2 = (float) 1.6;
+		float f3 = (float) 18.2;
+		bl1.addElement(i1, f1);
+		bl1.addElement(i2, f2);
+		bl1.addElement(i3, f3);
+		
+		ByteLine bl2 = new ByteLine(3, "AB0");
+		int i21 = 3;
+		int i22 = 5;
+		int i23 = 10;
+		float f21 = (float) 2;
+		float f22 = (float) 2.6;
+		float f23 = (float) 28.2;
+		bl2.addElement(i21, f21);
+		bl2.addElement(i22, f22);
+		bl2.addElement(i23, f23);
+		
+		LinkedList<ByteLine> list = new LinkedList<ByteLine>();
+		list.add(bl1);
+		list.add(bl2);
+		
+		ByteLine b = ByteLine.sumFeatureValues(list, 11);
+		for(int pos=0; pos<b.getSize(); pos++){
+			System.out.print(pos);
+			System.out.println("\t"+b.getIndices()[pos]+":"+b.getValues()[pos]);
+		}
+		*/
+		
 		
 	
-		/*
+		
 		//read in list of genes -> genes to keep in filtering
 		readGenes(geneList); //ok
 		
@@ -40,15 +82,21 @@ public class ProfileGenerator {
 		filterTerm(termIn, termOut, infoOut); //ok
 		
 		//read .weight -> translate it and filter it (filter only rows; keep all columns, keep indices = no shift of indices necessary)
-		filterWeight(weightIn, weigthOut, geneListProfiles);
+		filterWeight(weightIn, weigthOut, geneListProfiles); //ok
 		
-		//create complete matrix (non-existing values -> 0) a la viscovery format
+		/*
+		//OPTIONAL: create complete matrix (non-existing values -> 0) a la viscovery format:
 		//gene, number of non-0-elements, list of values for features
-		createCompleteMatrix(weigthOutComplete);
+		createCompleteMatrix(weigthOutComplete); //ok
 		*/
+		
+		// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: feat.txt)
+		createClusterMatrix(clusterMatrix);
+		
 	}
 
 	//-----------------------------------------------------------------------
+
 
 
 	//read in list of genes -> genes to keep in filtering (keep these rows)
@@ -169,28 +217,7 @@ public class ProfileGenerator {
 				*/
 				
 				bl.write(writer);
-				lines.add(bl);
-				
-				
-				/*
-				//TODO checken, ob lines mit gleichem gen gelich sind:
-				if(row==16084|| row ==23066){
-					int[] i = bl.getIndices();
-					float[] f = bl.getValues();
-					for(int pos=0; pos<bl.getSize(); pos++){
-						System.out.print("\t"+i[pos]+":"+f[pos]);
-						
-						// for plotting: write only values
-						//writer.write("\t"+values[pos]);
-						//writer.write(values[pos]+"\n"); // one value per line -> distribution?!
-					}
-					System.out.print("\n");
-				}
-				*/
-				
-				
-				
-				
+				lines.add(bl);	
 			}
 			row++;
 		}
@@ -199,25 +226,22 @@ public class ProfileGenerator {
 	}
 	
 	
-	
+	// OPTIONAL
 	// create complete matrix from ByteLine list (fill with "0"); keep 0-columns
 	private static void createCompleteMatrix(String weigthOutComplete) {
 		FileOutputWriter writer = new FileOutputWriter(weigthOutComplete);
-		int n = 88536; // number of columns (= number of terms)
 		
 		HashSet<String> uniqTerms = new HashSet<String>(); // after char replacement, some terms end up being identical -> add "_" to end
 	 	
 		//write header
-		// Replace non-alphanumeric characters -> "", " "->"_"
+		// Replace non-alphanumeric characters -> "_"
 		writer.write("Gene\tnon0elements");
-		for (int pos=0; pos<n; pos++){
+		for (int pos=0; pos<index2term.size(); pos++){ // index2term.size() = 88536 = number of columns
 			String t = index2term.get(pos);
-			t = t.replaceAll(" |-", "_");		
-			t = t.replaceAll("[^A-Za-z0-9_]", "");
-			// test, if term is still unique
+			t = t.replaceAll("[^A-Za-z0-9]", "_");
+			// test, if term is still unique; otherwise add "_"
 			if(uniqTerms.contains(t)){
 				t = t+"_";
-
 			}
 			uniqTerms.add(t);
 			writer.write("\t"+t);	
@@ -236,12 +260,41 @@ public class ProfileGenerator {
 			}
 			uniqGenes.add(g);
 			
-			writer.write(g+"\t");
-            bl.writeComplete(writer, n);
+			writer.write(g+"\t"+bl.getSize());
+            bl.writeComplete(writer, index2term.size());
         }
         
 		writer.closer();
 	}
 	
+	
+	// OPTIONAL
+	// create matrix for hierarchical clustering of genes based on their annotation/ their feature values
+	// (= write output of svmclust.pl: feat.txt)
+	private static void createClusterMatrix(String clusterMatrix) {
+		FileOutputWriter writer = new FileOutputWriter(clusterMatrix);
+		
+		// write header
+		writer.write("UID\tNAME\tGWEIGHT");
+		for (int pos=0; pos<index2term.size(); pos++){		// index2term.size() = 88536 = number of columns
+			String t = index2term.get(pos);
+			writer.write("\t"+t);	
+		}
+		writer.write("\n"); 
+		
+		// write second line with EWEIGHT (jeweils Summe ueber values bilden pro feature!?!)
+		writer.write("EWEIGHT\t\t");
+		ByteLine bl_sum = ByteLine.sumFeatureValues(lines, index2term.size()); // index2term.size() = 88536 = number of columns
+		bl_sum.writeComplete(writer,index2term.size());		
+		
+		// write actual matrix with feature values for genes
+		for (ByteLine bl : lines) {
+			String g = bl.getGene();
+			writer.write(g+"\t"+g+"\t1");
+            bl.writeComplete(writer, index2term.size());
+        }
+
+		writer.closer();
+	}
 	
 }
