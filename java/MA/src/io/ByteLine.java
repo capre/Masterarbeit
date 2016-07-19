@@ -173,16 +173,29 @@ public class ByteLine {
 		
 		float[] valSum = new float[n]; // array to sum up values for features
 		
+		// ...wenn man nicht summe, sondern mittelwerte berechnen will:
+		int[] counter = new int[n];
+		
 		//jede ByteLine abarbeiten, und werte fuer features jeweils in array hinzuaddieren
 		for (ByteLine bl : lines){
 			for(int pos=0; pos<bl.getSize(); pos++){
 				valSum[bl.getIndices()[pos]] += bl.getValues()[pos];
+				counter[bl.getIndices()[pos]]++;
 			}
 		}
 		
 		// neue ByteLine aufbauen
 		for(int pos=0; pos<n; pos++){
-			bl_sum.addElement(pos, valSum[pos]);
+			// summe:
+			//bl_sum.addElement(pos, valSum[pos]);
+			
+			//ODER mittelwerte:
+			if(counter[pos]!=0){
+				bl_sum.addElement(pos, (valSum[pos]/counter[pos]));
+			}else{
+				bl_sum.addElement(pos, (float)0);
+			}
+			
 		}
 		
 		return bl_sum;
