@@ -91,7 +91,7 @@ public class ProfileGenerator {
 		*/
 		
 		// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: feat.txt)
-		createClusterMatrix(clusterMatrix);
+		createClusterMatrix(clusterMatrix); //ok
 		
 	}
 
@@ -282,10 +282,17 @@ public class ProfileGenerator {
 		}
 		writer.write("\n"); 
 		
-		// write second line with EWEIGHT (jeweils Summe ueber values bilden pro feature!?!)
+		// write second line with EWEIGHT (entweder gewichtete summe, oder 1)
 		writer.write("EWEIGHT\t\t");
-		ByteLine bl_sum = ByteLine.sumFeatureValues(lines, index2term.size()); // index2term.size() = 88536 = number of columns
-		bl_sum.writeComplete(writer,index2term.size());		
+		//	gewichtete summe:
+		//ByteLine bl_sum = ByteLine.sumFeatureValues(lines, index2term.size()); // index2term.size() = 88536 = number of columns
+		//bl_sum.writeComplete(writer,index2term.size());	
+		//	1er:
+		for(int c=0; c<index2term.size(); c++){
+			writer.write("\t1");
+		}
+		writer.write("\n");
+		
 		
 		// write actual matrix with feature values for genes
 		for (ByteLine bl : lines) {
