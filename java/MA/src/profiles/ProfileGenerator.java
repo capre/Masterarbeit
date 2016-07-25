@@ -90,9 +90,10 @@ public class ProfileGenerator {
 		createCompleteMatrix(weigthOutComplete); //ok
 		*/
 		
+		/*
 		// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: feat.txt)
 		createClusterMatrix(clusterMatrix); //ok
-		
+		*/
 	}
 
 	//-----------------------------------------------------------------------
@@ -181,15 +182,14 @@ public class ProfileGenerator {
 	private static void filterWeight(String weightIn, String weigthOut, String geneListProfiles){
 		ByteReader reader = new ByteReader(weightIn);
 		FileOutputWriter writer = new FileOutputWriter(weigthOut);
-		//FileOutputWriter writerGenes = new FileOutputWriter(geneListProfiles);
+		FileOutputWriter writerGenes = new FileOutputWriter(geneListProfiles);
 		lines = new LinkedList<ByteLine>();
 
 		// 3 int numbers: Zahl der Spalten (88536); Zahl der Zeilen (88536); Zahl der sparse elements (15213762)
 		for (int n=1; n<=3; n++){
 			int i = reader.readInt();
-			//writer.write(i+"\t");
+			//System.out.println(i+"\t");
 		}
-		//writer.write("\n");
 		
 		// read all "lines" in file:
 		int row = 0;
@@ -205,16 +205,16 @@ public class ProfileGenerator {
 			// filter this ByteLine for columns (adjust indices) before writing
 			if(old_indices.containsKey(row)){
 				/*
-				 * for filtering columns:
+				// for filtering columns:
 				ByteLine blFiltered = bl.filter(old_indices, new_indices);
 				blFiltered.write(writer);
+				*/
 				
 				// also write geneListProfiles
-				String gene = old_indices.get(row);
 				int oldInd = row;
 				int newInd = new_indices.get(gene);
 				writerGenes.write(gene+"\t"+oldInd+"\t"+newInd+"\n");
-				*/
+				
 				
 				bl.write(writer);
 				lines.add(bl);	
@@ -222,7 +222,7 @@ public class ProfileGenerator {
 			row++;
 		}
 		writer.closer();
-		//writerGenes.closer();
+		writerGenes.closer();
 	}
 	
 	
