@@ -25,7 +25,7 @@ public class MainSchizoParser2 {
 		 * 7: mergeViscoveryMatrices
 		 */
 		args=new String[1];
-		args[0]="";
+		args[0]="createInputSVM";
 		
 		
 		if(args.length==0){
@@ -38,13 +38,13 @@ public class MainSchizoParser2 {
 			// -> generate 1 / 2 collection file(s): "!AllProbandsList.txt" or ...
 			// add information about "diseased = 1 vs 0"
 			if(args[0].equals("createAllProbands")){
-				String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
-				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
+				String path = "D:/MA_data/Dataset_2_part/Files/";
+				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/"; 
 				
-				//String pathIn = path+ "Analysis_caddSum/";
-				String pathIn = path+ "variants/Analysis_variants2.0/";
+				String pathIn = path+ "Analysis_caddSum_normL/";
+				//String pathIn = path+ "variants/Analysis_variants2.0/";
 				//String pathIn = "/storageNGS/ngs2/projects/exome/schizo_ionTorrent/Analysis/Final/CADD/Swedish_Case_Control/Analysis/";
-				String pathOut = path+"!AllProbandsList_vars2.0.txt";
+				String pathOut = path+"!AllProbandsList_normL.txt";
 				//String pathOutCase = path+"!AllCasesList.txt";
 				//String pathOutControl = path+"!AllControlsList.txt";
 				String pathCases = path+"case_ids_study.txt";
@@ -70,17 +70,18 @@ public class MainSchizoParser2 {
 			// input file has to consist of "blocks" for each patient = same id in multiple consecutive lines
 			//matrix: patients in rows, disease status in column, genes in columns
 			else if(args[0].equals("createMatrixViscovery")){
-				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				String path = "D:/MA_data/Dataset_2_part/Files/";
 				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
-				String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
+				//String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 				
 				//String pathIn = path+"noNorm/!AllProbandsList.txt";
 				//String pathInGenes = path+"noNorm/!GeneList.txt";
 				
-				String pathIn = path+"gt_all/!AllProbands_gt_part.txt";
-				String pathInGenes = path+"gt_all/!GeneList_gt_part.txt";
+				String pathIn = path+"!AllProbandsList_normL.txt";
+				String pathInGenes = path+"!GeneList_normL.txt";
 				
-				String pathOut = path+"gt_all/!Matrix_gt.txt";
+				String pathOut = path+"!Matrix_normL.txt";
+				
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
@@ -98,17 +99,18 @@ public class MainSchizoParser2 {
 			// +1 diseased (case) vs -1 healthy(control)
 			// (-> feat.scale,feat.name, feat.ids)
 			else if(args[0].equals("createInputSVM")){
-				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				String path = "D:/MA_data/Dataset_2_part/Files/";
 				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
-				String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
+				//String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 				
 				//String pathIn = path+"noNorm/!Matrix_scale.txt";
 				//String pathOut = path+"!Matrix_SVM_scale.txt";
-				String pathIn = path+"gt_all/!Matrix_gt.txt";
-				String pathOut = path+"gt_all/!SVM_gt.txt";
+				String pathIn = path+"!Matrix_normL.txt";
+				String pathOut = path+"!SVM_normL.txt";
 				
-				String pathOutGenes = path+"gt_all/!SVM_gt.name";
-				String pathOutIds = path+"gt_all/!SVM_gt.ids";
+				String pathOutGenes = path+"!SVM_normL.name";
+				String pathOutIds = path+"!SVM_normL.ids";
+				
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
@@ -124,12 +126,12 @@ public class MainSchizoParser2 {
 			// PART 4 :createGeneList
 			// generate list of all genes from !AllProbandsList.txt 
 			else if(args[0].equals("createGeneList")){
-				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
+				String path = "D:/MA_data/Dataset_2_part/Files/";
 				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
-				String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
+				//String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 				
-				String pathIn = path+"gt_all/!AllProbands_gt_part.txt";
-				String pathOut = path+"gt_all/!GeneList_gt_part.txt";
+				String pathIn = path+"!AllProbandsList_normL.txt";
+				String pathOut = path+"!GeneList_normL.txt";
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
@@ -310,8 +312,8 @@ public class MainSchizoParser2 {
 		File[] listOfFiles = folder.listFiles();
 		for (File file : listOfFiles) {
 			if (file.isFile()) {
-				// only look at *.caddSum.tsv files...
-				if(file.getName().endsWith(".variants.tsv")){ // or: ".caddSum.tsv"
+				// only look at *.caddSum.tsv files... etc.
+				if(file.getName().endsWith(".caddSumNormL.tsv")){ // or: ".caddSum.tsv" or ".variants.tsv"
 					String pathIn = path+file.getName();
 					//read patient id from file name
 					String[] a = file.getName().split("\\.");
