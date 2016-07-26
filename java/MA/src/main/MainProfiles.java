@@ -1,7 +1,5 @@
 package main;
 
-import io.FileInputReader;
-import profiles.Annotation;
 import profiles.ProfileCalculator;
 import profiles.ProfileGenerator;
 
@@ -39,9 +37,7 @@ public class MainProfiles {
 		String matrixProbandsOutSVM = path+"!SVM_scale_profile.txt";
 		
 		// generate a matrix of probands "annotated" by features of profiles
-		ProfileCalculator.run(termIn,weigthOut,geneListProfiles,matrixProbandsIn, matrixProbandsOut,matrixProbandsOutSVM);
-		
-
+		//ProfileCalculator.run(termIn,weigthOut,geneListProfiles,matrixProbandsIn, matrixProbandsOut,matrixProbandsOutSVM);
 		
 		
 	}

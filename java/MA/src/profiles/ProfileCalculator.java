@@ -1,6 +1,5 @@
 package profiles;
 
-import java.security.GeneralSecurityException;
 import java.util.HashMap;
 
 import io.FileInputReader;
@@ -30,17 +29,17 @@ public class ProfileCalculator {
 		//read weightOut and create Annotation objects in HashMap gene2annotation
 		createAnnotations(weigthOut,geneListProfiles); //ok, bis auf doppelte zeilen zu genen...
 		
-		/*
+		
 		// OPTIONAL:create output matrix in Viscovery format (matrixProbandsOut)
 		// ca 8 min; 4.65 GB
 		boolean svm = false;
 		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOut, svm); // ok
-		*/
+		
 		
 		
 		// OPTIONAL:create output matrix in SVM format (matrixProbandsOutSVM)
 		// ca 13 min; 7.11 GB
-		boolean svm = true;
+		svm = true;
 		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOutSVM, svm); 
 		
 		

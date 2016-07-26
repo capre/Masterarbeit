@@ -17,14 +17,7 @@ public class ProfileGenerator {
 	private static HashMap<Integer, String> old_indices; // original_index --> Gene
 	private static HashMap<String, Integer> new_indices; // Gene --> new, shifted index (only used for index_shift in case of column-filtering)
 	private static LinkedList<ByteLine> lines;
-	/* sizes: 
-	System.out.println(geneSet.size());		//20890		
-	System.out.println(term2gene.size());	//12330
-	System.out.println(index2term.size());	//88536 	= number of columns (= number of terms)
-	System.out.println(old_indices.size());	// 9744		= number of rows after filtering
-	System.out.println(new_indices.size());	// 9722 	(22 genes occur twice as they have two terms assigned...)
-	System.out.println(lines.size());		// 9744		= number of rows after filtering
-	*/
+
 	
 	/*
 	// run method 
@@ -94,6 +87,15 @@ public class ProfileGenerator {
 		// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: feat.txt)
 		createClusterMatrix(clusterMatrix); //ok
 		*/
+		
+		//sizes: 
+		System.out.println(geneSet.size());		//20890		
+		System.out.println(term2gene.size());	//12300 [12330] 
+		System.out.println(index2term.size());	//88536 	= number of columns (= number of terms)
+		System.out.println(old_indices.size());	// 9717 [9744]		= number of rows after filtering
+		System.out.println(new_indices.size());	// 9717 [9722]	(22 genes occur twice as they have two terms assigned...)
+		System.out.println(lines.size());		// 9717 [9744]		= number of rows after filtering
+		
 	}
 
 	//-----------------------------------------------------------------------
@@ -122,20 +124,39 @@ public class ProfileGenerator {
 		FileOutputWriter writer = new FileOutputWriter(mapOut);
 		String line;
 		
+		// which terms should be ignored? eg, some genes have 2 terms... -> ignore one
+		HashSet<String> ignore = new HashSet<String>();
+		ignore.add("cardiotrophin-like cytokine");
+		ignore.add("CAZ-associated structural protein");
+		
+		// use copy of geneSet and remove genes already found
+		HashSet<String> geneSetCopy = new HashSet<String>();
+		geneSetCopy.addAll(geneSet);
+		
 		term2gene = new HashMap<String,String>();
 		int c = 1;
 
 		while((line=reader.read())!=null){ // pm0100050	LNK	lymphocyte adaptor protein
 			String[] l = line.split("\t");
-			if(geneSet.contains(l[1])){
-				writer.write(line+"\t"+c+"\n");
-				term2gene.put(l[0], l[1]);
+			if(geneSetCopy.contains(l[1])){
+				if(!ignore.contains(l[2])){
+					writer.write(line+"\t"+c+"\n");
+					term2gene.put(l[0], l[1]);
+					// if there are two terms for one gene -> remove gene from set to ignore second line
+					geneSetCopy.remove(l[1]);
+				}
+				else{
+					System.out.println("ignore line: \""+line+"\" in .map file");
+				}
 			}
 			c++;
 		}
 		reader.closer();
 		writer.closer();
 		
+		//System.out.println("geneSet: "+geneSet.size());			// still 20890
+		//System.out.println("geneSetCopy: "+geneSetCopy.size());	// 8590 => 12300 removed
+
 	}
 	
 	
@@ -196,7 +217,7 @@ public class ProfileGenerator {
 		int number; // get length of line, or -1 if file is completely read
 		while((number = reader.readInt())!=-1){
 			
-			String gene =old_indices.get(row);
+			String gene =old_indices.get(row); // returns null, if line does not belong to one of "my" genes (does not matter)
 			ByteLine bl = reader.readElements(number, gene);
 			//bl.write(writer);	//write all ByteLines (unfiltered)
 			
