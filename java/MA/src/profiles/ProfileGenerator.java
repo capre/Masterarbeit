@@ -77,16 +77,16 @@ public class ProfileGenerator {
 		//read .weight -> translate it and filter it (filter only rows; keep all columns, keep indices = no shift of indices necessary)
 		filterWeight(weightIn, weigthOut, geneListProfiles); //ok
 		
-		/*
+		
 		//OPTIONAL: create complete matrix (non-existing values -> 0) a la viscovery format:
 		//gene, number of non-0-elements, list of values for features
 		createCompleteMatrix(weigthOutComplete); //ok
-		*/
 		
-		/*
+		
+		
 		// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: feat.txt)
 		createClusterMatrix(clusterMatrix); //ok
-		*/
+		
 		
 		//sizes: 
 		System.out.println(geneSet.size());		//20890		
@@ -128,6 +128,9 @@ public class ProfileGenerator {
 		HashSet<String> ignore = new HashSet<String>();
 		ignore.add("cardiotrophin-like cytokine");
 		ignore.add("CAZ-associated structural protein");
+		ignore.add("malignancy-associated protein");
+		ignore.add("p53-responsive gene 4");
+		ignore.add("receptor-interacting factor 1");
 		
 		// use copy of geneSet and remove genes already found
 		HashSet<String> geneSetCopy = new HashSet<String>();

@@ -2,17 +2,11 @@ package profiles;
 
 import java.util.HashMap;
 
+import io.ByteLine;
 import io.FileInputReader;
 import io.FileOutputWriter;
 
 public class ProfileCalculator {
-
-
-	/*
-	 * anmerkung: was mache ich jetzt mit Genen, zu denen 2 AnnotationsZeilen gehoeren?!?
-	 * hier wird das momentan ignoriert.. also wird praktisch einfach die erste annotations-zeile ignoriert 
-	 * (von der zweiten einfach ueberschrieben..)
-	 */
 	
 	
 	private static HashMap<Integer, String> index2term;		// size 88536
@@ -20,7 +14,7 @@ public class ProfileCalculator {
 	
 	
 	public static void run(String termIn,String weigthOut,String geneListProfiles,String matrixProbandsIn,
-			String matrixProbandsOut,String matrixProbandsOutSVM) {
+			String matrixProbandsOut,String matrixProbandsOutSVM,String matrixProbandsCluster) {
 		
 
 		//read in terms and create index2term
@@ -29,18 +23,28 @@ public class ProfileCalculator {
 		//read weightOut and create Annotation objects in HashMap gene2annotation
 		createAnnotations(weigthOut,geneListProfiles); //ok, bis auf doppelte zeilen zu genen...
 		
-		
+		/*
 		// OPTIONAL:create output matrix in Viscovery format (matrixProbandsOut)
+		// mode specifies format for output-matrix: Viscovery; SVM; clustering (featProbands.txt)
 		// ca 8 min; 4.65 GB
-		boolean svm = false;
-		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOut, svm); // ok
-		
+		boolean ignoreNegativeCadd = false;
+		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOut, "Viscovery", ignoreNegativeCadd); // ok
+		*/
 		
 		
 		// OPTIONAL:create output matrix in SVM format (matrixProbandsOutSVM)
+		// mode specifies format for output-matrix: 1=Viscovery; 2=SVM; 3=for clustering (featProbands.txt)
 		// ca 13 min; 7.11 GB
-		svm = true;
-		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOutSVM, svm); 
+		boolean ignoreNegativeCadd = false;
+		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOutSVM, "SVM", ignoreNegativeCadd); 
+		
+		
+		/*
+		// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: featProbands.txt)
+		// mode specifies format for output-matrix: 1=Viscovery; 2=SVM; 3=for clustering (featProbands.txt)
+		boolean ignoreNegativeCadd = false;
+		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsCluster, "clustering", ignoreNegativeCadd); 
+		*/
 		
 		
 		
@@ -123,10 +127,6 @@ public class ProfileCalculator {
 				gene2annotation.put(gene, a);
 			}
 			else{
-				// TODO
-				// ergibt die 22 zeilen (indices), die ueberschrieben wurden, weil es zu den gen 2 zeilen gibt...
-				// muss man noch aendern vorher, aber hier erstmal ignorieren...
-				// dann sollte das nicht mehr passieren
 				System.out.println("Something went wrong: newIndex2gene does not contain a gene for line index "+counter);
 			}
 			counter++;
@@ -136,21 +136,39 @@ public class ProfileCalculator {
 	
 
 	// go through matrixProbandsIn, transfer Cadd-sum-scores to scores for feature in profiles, and write matrixOut
-	// if svm=false: write Viscovery format; if svm=true: write SVM format
-	private static void createMatrixProbandsOut(String matrixProbandsIn, String matrixOut, boolean svm) {
+	// mode specifies format for output-matrix: 1=Viscovery; 2=SVM; 3=clustering (featProbands.txt)
+	// ignoreNegativeCadd specifies if negative Cadd scores are used for weighting or ignored
+	private static void createMatrixProbandsOut(String matrixProbandsIn, String matrixOut, String mode, boolean ignoreNegativeCadd) {
 		FileInputReader reader = new FileInputReader(matrixProbandsIn);
 		FileOutputWriter writer = new FileOutputWriter(matrixOut);
 		
-		if(!svm){
-			// write header of output (features) for Viscovery format
+		// write header of output (features) for Viscovery format
+		if(mode.equals("Viscovery")){
 			writer.write("Id\tDisease");
 			for(int pos=0; pos<index2term.size(); pos++){
 				writer.write("\t"+index2term.get(pos));
 			}
 			writer.write("\n");
 		}
+		// write header lines for clustering output:
+		else if(mode.equals("clustering")){
+			writer.write("UID\tNAME\tGWEIGHT");
+			for (int pos=0; pos<index2term.size(); pos++){		// index2term.size() = 88536 = number of columns
+				String t = index2term.get(pos);
+				writer.write("\t"+t);	
+			}
+			writer.write("\n"); 
+			
+			// write second line with EWEIGHT (always 1)
+			writer.write("EWEIGHT\t\t");
+			for(int c=0; c<index2term.size(); c++){
+				writer.write("\t1");
+			}
+			writer.write("\n");
+		}
+
 		
-		// header line of input matrix contains names of genes: Id	Disease	A1BG	A1BG-AS1	A1CF	A2M	A2M-AS1	A2ML1
+		// input header line of input matrix contains names of genes: Id	Disease	A1BG	A1BG-AS1	A1CF	A2M	A2M-AS1	A2ML1
 		String line=reader.read(); // header line
 		String[] genes = line.split("\t"); // length 20892
 
@@ -159,17 +177,28 @@ public class ProfileCalculator {
 		// for each proband: collect sums in float[] scores
 		while((line=reader.read())!=null){ // 106943	0	-0.02218738	-0.06134299	-0.21537343871
 			String[] l = line.split("\t");
+			String id = l[0];
+			String label = l[1];
 			
-			// write 1st (and 2nd) column
-			if(!svm){writer.write(l[0]+"\t"+l[1]);}
-			else{
-				if(Integer.parseInt(l[1])>0){writer.write("1");} // case
+			// write first columns (before data values)
+			if(mode.equals("Viscovery")){
+				writer.write(id+"\t"+label);
+				}
+			else if(mode.equals("SVM")){
+				if(Integer.parseInt(label)>0){writer.write("1");} // case
 				else{writer.write("-1");} // control
 			}
+			else if(mode.equals("clustering")){
+				writer.write(id+"\t"+id+"\t1");
+			}
+			else{
+				System.out.println("Error: choose outpur format properly.");
+			}
+			
 			
 			float[] scores = new float[index2term.size()]; //88536 = number of columns = number of features
 			for(int pos=2; pos<genes.length; pos++){
-				if(gene2annotation.containsKey(genes[pos])){ // annotation for this gene available (9722 times)
+				if(gene2annotation.containsKey(genes[pos])){ // annotation for this gene available
 					// --> transfer Cadd-sum-scores to features (refresh float[] scores)
 					float cadd = Float.parseFloat(l[pos]);
 					/*
@@ -182,9 +211,13 @@ public class ProfileCalculator {
 					System.out.println(fd);	//4.922801539694967E-4
 					 */
 					
-					scores = addAnnotationToScores_ignoreNegativeCadd(scores, gene2annotation.get(genes[pos]), cadd);
+					if(ignoreNegativeCadd){
+						scores = addAnnotationToScores_ignoreNegativeCadd(scores, gene2annotation.get(genes[pos]), cadd);
+					}else{
+						scores = addAnnotationToScores(scores, gene2annotation.get(genes[pos]), cadd);
+					}
 				}
-				else{ // 11168 times (11168 + 9722 = 20890; ok)
+				else{
 					//System.out.println("n"+genes[pos]);
 				}
 			}
@@ -192,8 +225,20 @@ public class ProfileCalculator {
 			// write output line
 			for (int pos=0; pos<scores.length; pos++){
 				float f = scores[pos];
-				if(!svm){writer.write("\t"+f);}
-				else{writer.write(" "+(pos+1)+":"+f);}
+				
+				if(mode.equals("Viscovery")){
+					writer.write("\t"+f);
+					}
+				else if(mode.equals("SVM")){
+					writer.write(" "+(pos+1)+":"+f);
+				}
+				else if(mode.equals("clustering")){
+					writer.write("\t"+f);
+				}
+				else{
+					System.out.println("Error: choose outpur format properly.");
+				}
+				
 			}
 			writer.write("\n");
 			
