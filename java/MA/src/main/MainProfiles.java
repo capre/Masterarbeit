@@ -42,7 +42,7 @@ public class MainProfiles {
 		String matrixProbandsCluster = path+mode+"featProbands.txt";
 		
 		// generate a matrix of probands "annotated" by features of profiles
-		ProfileCalculator.run(termIn,weigthOut,geneListProfiles,matrixProbandsIn, matrixProbandsOut,matrixProbandsOutSVM,matrixProbandsCluster);
+		//ProfileCalculator.run(termIn,weigthOut,geneListProfiles,matrixProbandsIn, matrixProbandsOut,matrixProbandsOutSVM,matrixProbandsCluster);
 		
 		
 	}
