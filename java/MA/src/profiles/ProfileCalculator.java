@@ -23,26 +23,27 @@ public class ProfileCalculator {
 		//read weightOut and create Annotation objects in HashMap gene2annotation
 		createAnnotations(weigthOut,geneListProfiles); //ok, bis auf doppelte zeilen zu genen...
 		
-		
+		/*
 		// OPTIONAL:create output matrix in Viscovery format (matrixProbandsOut)
 		// mode specifies format for output-matrix: Viscovery; SVM; clustering (featProbands.txt)
 		// ca 8 min; 4.65 GB
 		boolean ignoreNegativeCadd = false;
 		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOut, "Viscovery", ignoreNegativeCadd); // ok
+		*/
 		
-		
-		
+		/*
 		// OPTIONAL:create output matrix in SVM format (matrixProbandsOutSVM)
 		// mode specifies format for output-matrix: 1=Viscovery; 2=SVM; 3=for clustering (featProbands.txt)
 		// ca 13 min; 7.11 GB
 		ignoreNegativeCadd = false;
 		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOutSVM, "SVM", ignoreNegativeCadd); 
-		
+		*/
 		
 		
 		// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: featProbands.txt)
 		// mode specifies format for output-matrix: 1=Viscovery; 2=SVM; 3=for clustering (featProbands.txt)
-		ignoreNegativeCadd = false;
+		// max 10 min
+		boolean ignoreNegativeCadd = false;
 		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsCluster, "clustering", ignoreNegativeCadd); 
 		
 		
@@ -189,7 +190,10 @@ public class ProfileCalculator {
 				else{writer.write("-1");} // control
 			}
 			else if(mode.equals("clustering")){
-				writer.write(id+"\t"+id+"\t1");
+				String s="";
+				if(Integer.parseInt(label)>0){s="1_"+id;} // case
+				else{s="-1_"+id;} // control
+				writer.write(s+"\t"+s+"\t1");
 			}
 			else{
 				System.out.println("Error: choose outpur format properly.");

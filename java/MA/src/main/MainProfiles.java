@@ -7,13 +7,13 @@ public class MainProfiles {
 
 	public static void main(String[] args) {
 		
-		String path = "/home/ibis/carolin.prexler/Documents/ProfileAnalysis/";
+		String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/ProfileAnalysis/";
 		//String path = "D:/MA_data/Dataset_2_part/ProfileAnalysis/";
 		
 		String pathProbands = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 		//String pathProbands = "D:/MA_data/Dataset_2_part/Files/";
 		
-		String mode = "noNorm/"; // use noNorm/ (all genes) OR normL/ (genes with length, for Cadd-score normalisation)
+		String mode = "normL/"; // use noNorm/ (all genes) OR normL/ (genes with length, for Cadd-score normalisation)
 
 		//input
 		//String geneList = pathProbands+mode+"!GeneList_normL.txt";
@@ -35,14 +35,15 @@ public class MainProfiles {
 		//ProfileGenerator.run(geneList,mapIn,termIn,weightIn, mapOut,termOut,weigthOut,weigthOutComplete,geneListProfiles,infoOut,clusterMatrix);
 		
 
-		//String matrixProbandsIn = pathProbands+mode+"!Matrix_normL.txt";
-		String matrixProbandsIn = pathProbands+mode+"!Matrix_scale.txt";
+		String matrixProbandsIn = pathProbands+mode+"!Matrix_normL.txt";
+		//String matrixProbandsIn = pathProbands+mode+"!Matrix_scale.txt";
 		String matrixProbandsOut = path+mode+"!Matrix_scale_profile.txt";
 		String matrixProbandsOutSVM = path+mode+"!SVM_scale_profile.txt";
-		String matrixProbandsCluster = path+mode+"featProbands.txt";
+		String matrixProbandsCluster = path+mode+"featProbands_normL.txt";
+		//String matrixProbandsCluster = path+mode+"featProbands.txt";
 		
 		// generate a matrix of probands "annotated" by features of profiles
-		//ProfileCalculator.run(termIn,weigthOut,geneListProfiles,matrixProbandsIn, matrixProbandsOut,matrixProbandsOutSVM,matrixProbandsCluster);
+		ProfileCalculator.run(termIn,weigthOut,geneListProfiles,matrixProbandsIn, matrixProbandsOut,matrixProbandsOutSVM,matrixProbandsCluster);
 		
 		
 	}
