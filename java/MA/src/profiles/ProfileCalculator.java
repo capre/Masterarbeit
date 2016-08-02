@@ -1,6 +1,7 @@
 package profiles;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import io.ByteLine;
 import io.FileInputReader;
@@ -13,40 +14,21 @@ public class ProfileCalculator {
 	private static HashMap<String, Annotation> gene2annotation;
 	
 	
-	public static void run(String termIn,String weigthOut,String geneListProfiles,String matrixProbandsIn,
-			String matrixProbandsOut,String matrixProbandsOutSVM,String matrixProbandsCluster) {
+	/*
+	// run method 
+	aufruf: ProfileCalculator.run(termIn,weigthOut,geneListProfiles);
+	*/
+	public static void run(String termIn,String weigthOut,String geneListProfiles) {
+		System.out.println("++ run ProfileCalculator ++");
 		
-
+		
 		//read in terms and create index2term
+		System.out.println("read .term");
 		readTerms(termIn); //ok
 		
 		//read weightOut and create Annotation objects in HashMap gene2annotation
-		createAnnotations(weigthOut,geneListProfiles); //ok, bis auf doppelte zeilen zu genen...
-		
-		/*
-		// OPTIONAL:create output matrix in Viscovery format (matrixProbandsOut)
-		// mode specifies format for output-matrix: Viscovery; SVM; clustering (featProbands.txt)
-		// ca 8 min; 4.65 GB
-		boolean ignoreNegativeCadd = false;
-		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOut, "Viscovery", ignoreNegativeCadd); // ok
-		*/
-		
-		/*
-		// OPTIONAL:create output matrix in SVM format (matrixProbandsOutSVM)
-		// mode specifies format for output-matrix: 1=Viscovery; 2=SVM; 3=for clustering (featProbands.txt)
-		// ca 13 min; 7.11 GB
-		ignoreNegativeCadd = false;
-		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOutSVM, "SVM", ignoreNegativeCadd); 
-		*/
-		
-		
-		// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: featProbands.txt)
-		// mode specifies format for output-matrix: 1=Viscovery; 2=SVM; 3=for clustering (featProbands.txt)
-		// max 10 min
-		boolean ignoreNegativeCadd = false;
-		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsCluster, "clustering", ignoreNegativeCadd); 
-		
-		
+		System.out.println("read filtered .weight and create annotations of genes");
+		createAnnotations(weigthOut,geneListProfiles); //ok
 		
 		
 		/*
@@ -56,7 +38,8 @@ public class ProfileCalculator {
 		
 		String line2 = "26\t0:7\t3:10\t4:-2";
 		Annotation a2 = new Annotation("FG", line2);
-		
+		*/
+		/*
 		float[] scores = new float[7];
 		for (float f : scores){
 			System.out.println("\t"+f);
@@ -78,11 +61,67 @@ public class ProfileCalculator {
 		}
 		System.out.println("--------------");
 		*/
-		
+		/*
+		//test addAnnotation: ok
+		Annotation sum = new Annotation("sum");
+		sum.addAnnotation(a1);
+		sum.addAnnotation(a2);
+		*/
+	}
+	
+	
+	// OPTIONAL:create output matrix in Viscovery format (matrixProbandsOut)
+	// Cadd Scores in matrixProbandsIn are used as weights (define, if negative cadd scores should be ignored or not)
+	// mode specifies format for output-matrix: Viscovery; SVM; clustering (featProbands.txt)
+	// ca 8 min; 4.65 GB
+	public static void writeViscoveryMatrix(String matrixProbandsIn,String matrixProbandsOut){
+		System.out.println("write matrix in Viscovery format");
+		boolean ignoreNegativeCadd = false;
+		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOut, "Viscovery", ignoreNegativeCadd); // ok
+	}
+	
+	// OPTIONAL:create output matrix in SVM format (matrixProbandsOutSVM)
+	// Cadd Scores in matrixProbandsIn are used as weights (define, if negative cadd scores should be ignored or not)
+	// mode specifies format for output-matrix: 1=Viscovery; 2=SVM; 3=for clustering (featProbands.txt)
+	// ca 13 min; 7.11 GB
+	public static void writeSvmMatrix(String matrixProbandsIn,String matrixProbandsOutSVM){
+		System.out.println("write matrix in SVM format");
+		boolean ignoreNegativeCadd = false;
+		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsOutSVM, "SVM", ignoreNegativeCadd);
+	}
+	
+	// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: featProbands.txt)
+	// Cadd Scores in matrixProbandsIn are used as weights (define, if negative cadd scores should be ignored or not)
+	// mode specifies format for output-matrix: 1=Viscovery; 2=SVM; 3=for clustering (featProbands.txt)
+	// ca 8 min
+	public static void writeClusterMatrix(String matrixProbandsIn,String matrixProbandsCluster){
+		System.out.println("write matrix for hierarchical clustering");
+		boolean ignoreNegativeCadd = false;
+		createMatrixProbandsOut(matrixProbandsIn,matrixProbandsCluster, "clustering", ignoreNegativeCadd); 
 	}
 
+	
+	
+	// OPTIONAL: get profile vector for group of genes (eg candGenes vs nonCandGenes) 
+	// output is one vector: first column=feature, second column=value OR one column=value
+	public static void writeProfileForGenes(String geneGroup, String profileForGenes){
+		System.out.println("write profile vector for given group of genes");
+		calcProfileForGenes(geneGroup, profileForGenes);
+	}
+	
+	// OPTIONAL: get profile vector for group of probands (eg cases vs controls)
+	// cadd scores in matrixProbandsIn are used as weights (specify if negative Cadd scores should be ignored or not)
+	// output is one vector: first column=feature, second column=value OR one column=value
+	public static void writeProfileForProbands(String matrixProbandsIn, String probandGroup, String profileForProbands){
+		System.out.println("write profile vector for given group of probands");
+		boolean ignoreNegativeCadd = false;
+		calcProfileForProbands(matrixProbandsIn, probandGroup, profileForProbands, ignoreNegativeCadd);
+	}
+	
 
 	// -----------------------------------------------------------------------------
+
+
 
 
 	//read in terms and create index2term
@@ -222,7 +261,7 @@ public class ProfileCalculator {
 					}
 				}
 				else{
-					//System.out.println("n"+genes[pos]);
+					//System.out.println(genes[pos]);
 				}
 			}
 			
@@ -266,7 +305,9 @@ public class ProfileCalculator {
 		// add it to float[] scores
 		HashMap<Integer, Float> values = annotation.getValues();
 		for(int index : values.keySet()){
+			//System.out.print(cadd+"*"+values.get(index)+"="+(cadd * values.get(index))+" + "+scores[index]+" = ");
 			scores[index] += cadd * values.get(index);
+			//System.out.println(scores[index]);
 		}
 	
 		return scores;
@@ -294,8 +335,97 @@ public class ProfileCalculator {
 	}
 
 	
+	// calculate profile (one vector) for the given group of genes by summing up the values for each feature
+	private static void calcProfileForGenes(String geneGroup, String profileForGenes) {
+		FileInputReader reader = new FileInputReader(geneGroup);
+		FileOutputWriter writer = new FileOutputWriter(profileForGenes);
+		
+		Annotation sum = new Annotation("GroupOfGenes");
+		String line;
+
+		while((line=reader.read())!=null){
+			if(gene2annotation.containsKey(line)){ // add values of this gene
+				sum.addAnnotation(gene2annotation.get(line));
+			}
+			else{
+				//System.out.println("no annotation for " + line + " available.");
+			}
+		}
+		reader.closer();
+		
+		for(int i=0; i<index2term.size(); i++){
+			float val = (float)0;
+			if(sum.getValues().containsKey(i)){
+				val = sum.getValues().get(i);
+			}
+			// also write terms:
+			//writer.write(index2term.get(i)+"\t");	
+			writer.write(val+"\n");	
+		}
+		writer.closer();
+	}
 	
-	
+
+	// calculate profile (one vector) for the given group of probands by summing up the values for each feature
+	// cadd scores in matrixProbandsIn are used as weights
+	private static void calcProfileForProbands(String matrixProbandsIn, String probandGroup, String profileForProbands, boolean ignoreNegativeCadd) {
+		FileInputReader readerMatrix = new FileInputReader(matrixProbandsIn);
+		FileInputReader readerIds = new FileInputReader(probandGroup);
+		FileOutputWriter writer = new FileOutputWriter(profileForProbands);
+		
+		float[] scores = new float[index2term.size()]; // to sum up weighted values for features/terms
+		String line;
+		
+		// read ids for which profile will be calculated
+		HashSet<String> idSet = new HashSet<String>();
+		while((line=readerIds.read())!=null){
+			idSet.add(line);
+		}
+		readerIds.closer();
+
+		// input header line of input matrix contains names of genes: Id	Disease	A1BG	A1BG-AS1	A1CF	A2M	A2M-AS1	A2ML1
+		line=readerMatrix.read(); // header line
+		String[] genes = line.split("\t"); // length 20892
+		
+		
+		// transfer scores for probands appearing in idSet : collect sums in float[] scores
+		while((line=readerMatrix.read())!=null){ // 106943	0	-0.02218738	-0.06134299	-0.21537343871
+			String[] l = line.split("\t");
+			String id = l[0];
+			String label = l[1];
+			
+			if(!idSet.contains(id)){
+				continue;
+			}
+			//System.out.println(id); // diese ids werden bearbeitet
+			
+			for(int pos=2; pos<genes.length; pos++){
+				if(gene2annotation.containsKey(genes[pos])){ // annotation for this gene available
+					// --> transfer Cadd-sum-scores to features (refresh float[] scores)
+					float cadd = Float.parseFloat(l[pos]);
+					
+					if(ignoreNegativeCadd){
+						scores = addAnnotationToScores_ignoreNegativeCadd(scores, gene2annotation.get(genes[pos]), cadd);
+					}else{
+						scores = addAnnotationToScores(scores, gene2annotation.get(genes[pos]), cadd);
+					}
+				}
+				else{
+					//System.out.println(genes[pos]);
+				}
+			}
+		}
+		readerMatrix.closer();
+		
+		// write output
+		for (int i=0; i<scores.length; i++){
+			float val = scores[i];
+			// also write terms:
+			//writer.write(index2term.get(i)+"\t");	
+			writer.write(val+"\n");
+		}
+		writer.closer();	
+	}
 	
 
 }

@@ -21,12 +21,40 @@ public class ProfileGenerator {
 	
 	/*
 	// run method 
-	aufruf: ProfileGenerator.run(geneList,mapIn,termIn,weightIn, 
-			mapOut,termOut,weigthOut,weigthOutComplete,geneListProfiles,infoOut,clusterMatrix);
+	aufruf: ProfileGenerator.run(geneList,mapIn,termIn,weightIn, mapOut,termOut,weigthOut,geneListProfiles,infoOut);
 	*/
 	public static void run(String geneList, String mapIn, String termIn, String weightIn, 
-			String mapOut, String termOut, String weigthOut, String weigthOutComplete, String geneListProfiles, String infoOut, String clusterMatrix){
+			String mapOut, String termOut, String weigthOut, String geneListProfiles, String infoOut){
 
+		System.out.println("++ run ProfileGenerator ++");
+
+		//read in list of genes -> genes to keep in filtering
+		System.out.println("read genes");
+		readGenes(geneList); //ok
+		
+		//filter .map (2nd column) + get term-ids (1st column)
+		System.out.println("filter .map for genes");
+		filterMap(mapIn, mapOut); //ok
+		
+		//filter .term (1st column) + get row-indices (0-based), which rows are kept -> for matrix filtering
+		System.out.println("read .term and get row indices");
+		filterTerm(termIn, termOut, infoOut); //ok
+		
+		//read .weight -> translate it and filter it (filter only rows; keep all columns, keep indices = no shift of indices necessary)
+		System.out.println("read .weight, translate it keeping only certain rows");
+		filterWeight(weightIn, weigthOut, geneListProfiles); //ok
+		
+		
+		/*
+		//sizes: // stimmt nicht mehr ganz...
+		System.out.println(geneSet.size());		//20890		
+		System.out.println(term2gene.size());	//12300 [12330] 
+		System.out.println(index2term.size());	//88536 	= number of columns (= number of terms)
+		System.out.println(old_indices.size());	// 9717 [9744]		= number of rows after filtering
+		System.out.println(new_indices.size());	// 9717 [9722]	(22 genes occur twice as they have two terms assigned...)
+		System.out.println(lines.size());		// 9717 [9744]		= number of rows after filtering
+		*/
+		
 		/*
 		//for testing
 		ByteLine bl1 = new ByteLine(3, "AB0");
@@ -61,42 +89,22 @@ public class ProfileGenerator {
 			System.out.println("\t"+b.getIndices()[pos]+":"+b.getValues()[pos]);
 		}
 		*/
-		
-		
-	
-		
-		//read in list of genes -> genes to keep in filtering
-		readGenes(geneList); //ok
-		
-		//filter .map (2nd column) + get term-ids (1st column)
-		filterMap(mapIn, mapOut); //ok
-		
-		//filter .term (1st column) + get row-indices (0-based), which rows are kept -> for matrix filtering
-		filterTerm(termIn, termOut, infoOut); //ok
-		
-		//read .weight -> translate it and filter it (filter only rows; keep all columns, keep indices = no shift of indices necessary)
-		filterWeight(weightIn, weigthOut, geneListProfiles); //ok
-		
-		
-		//OPTIONAL: create complete matrix (non-existing values -> 0) a la viscovery format:
-		//gene, number of non-0-elements, list of values for features
-		createCompleteMatrix(weigthOutComplete); //ok
-		
-		
-		
-		// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: feat.txt)
-		createClusterMatrix(clusterMatrix); //ok
-		
-		
-		//sizes: 
-		System.out.println(geneSet.size());		//20890		
-		System.out.println(term2gene.size());	//12300 [12330] 
-		System.out.println(index2term.size());	//88536 	= number of columns (= number of terms)
-		System.out.println(old_indices.size());	// 9717 [9744]		= number of rows after filtering
-		System.out.println(new_indices.size());	// 9717 [9722]	(22 genes occur twice as they have two terms assigned...)
-		System.out.println(lines.size());		// 9717 [9744]		= number of rows after filtering
-		
 	}
+	
+	//OPTIONAL: create complete matrix (non-existing values -> 0) a la viscovery format:
+	//gene, number of non-0-elements, list of values for features
+	public static void writeViscoveryMatrix(String weigthOutComplete){
+		System.out.println("write complete matrix in Viscovery format");
+		createCompleteMatrix(weigthOutComplete); //ok
+	}
+	
+	// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: feat.txt)
+	public static void writeClusterMatrix(String clusterMatrix){
+		System.out.println("write matrix for hierarchical clustering");
+		createClusterMatrix(clusterMatrix); //ok
+	}
+	
+	
 
 	//-----------------------------------------------------------------------
 

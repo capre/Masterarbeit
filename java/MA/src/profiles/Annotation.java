@@ -8,10 +8,17 @@ public class Annotation {
 	private HashMap<Integer, Float> values;
 	
 	
+	// create "filled" Annotation object
 	public Annotation(String gene, String line){
 		this.gene = gene;
 		this.values = new HashMap<Integer, Float>();
 		fill(line);
+	}
+	
+	// create "empty" Annotation object
+	public Annotation(String gene){
+		this.gene = gene;
+		this.values = new HashMap<Integer, Float>();
 	}
 
 	
@@ -38,6 +45,20 @@ public class Annotation {
 	}
 	
 
+	// add values of new Annotation a to Annotation object
+	public Annotation addAnnotation(Annotation a){
+		//System.out.println("add annotation for "+a.gene);
+		
+		for(int index : a.getValues().keySet()){
+			float val = (float)0;
+			if(this.values.containsKey(index)){	// add new value
+				val = this.values.get(index);
+			}
+			this.values.put(index, val+a.getValues().get(index));
+		}
+		
+		return this;
+	}
 	
 	
 	
