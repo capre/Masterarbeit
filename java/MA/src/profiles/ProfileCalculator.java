@@ -336,27 +336,33 @@ public class ProfileCalculator {
 
 	
 	// calculate profile (one vector) for the given group of genes by summing up the values for each feature
+	// then calculate mean
 	private static void calcProfileForGenes(String geneGroup, String profileForGenes) {
 		FileInputReader reader = new FileInputReader(geneGroup);
 		FileOutputWriter writer = new FileOutputWriter(profileForGenes);
 		
+		int counterAll = 0;		//counts whole number of input genes
+		int counterUsed = 0;	//counts number of used genes --> used for calculation of mean for values
 		Annotation sum = new Annotation("GroupOfGenes");
 		String line;
 
 		while((line=reader.read())!=null){
 			if(gene2annotation.containsKey(line)){ // add values of this gene
 				sum.addAnnotation(gene2annotation.get(line));
+				counterUsed++;
 			}
 			else{
 				//System.out.println("no annotation for " + line + " available.");
 			}
+			counterAll++;
 		}
 		reader.closer();
+		System.out.println(counterUsed+" genes of "+counterAll+" genes used for calculation of profile.");
 		
 		for(int i=0; i<index2term.size(); i++){
 			float val = (float)0;
 			if(sum.getValues().containsKey(i)){
-				val = sum.getValues().get(i);
+				val = (sum.getValues().get(i))/counterUsed; //calc mean
 			}
 			// also write terms:
 			//writer.write(index2term.get(i)+"\t");	
@@ -367,12 +373,15 @@ public class ProfileCalculator {
 	
 
 	// calculate profile (one vector) for the given group of probands by summing up the values for each feature
+	// then calculate mean
 	// cadd scores in matrixProbandsIn are used as weights
 	private static void calcProfileForProbands(String matrixProbandsIn, String probandGroup, String profileForProbands, boolean ignoreNegativeCadd) {
 		FileInputReader readerMatrix = new FileInputReader(matrixProbandsIn);
 		FileInputReader readerIds = new FileInputReader(probandGroup);
 		FileOutputWriter writer = new FileOutputWriter(profileForProbands);
 		
+		int counterAll = 0;		//counts whole number of probands in group
+		int counterUsed = 0;	//counts number of used probands --> used for calculation of mean for values
 		float[] scores = new float[index2term.size()]; // to sum up weighted values for features/terms
 		String line;
 		
@@ -380,6 +389,7 @@ public class ProfileCalculator {
 		HashSet<String> idSet = new HashSet<String>();
 		while((line=readerIds.read())!=null){
 			idSet.add(line);
+			counterAll++;
 		}
 		readerIds.closer();
 
@@ -392,12 +402,13 @@ public class ProfileCalculator {
 		while((line=readerMatrix.read())!=null){ // 106943	0	-0.02218738	-0.06134299	-0.21537343871
 			String[] l = line.split("\t");
 			String id = l[0];
-			String label = l[1];
+			//String label = l[1];
 			
 			if(!idSet.contains(id)){
 				continue;
 			}
 			//System.out.println(id); // diese ids werden bearbeitet
+			counterUsed++;
 			
 			for(int pos=2; pos<genes.length; pos++){
 				if(gene2annotation.containsKey(genes[pos])){ // annotation for this gene available
@@ -416,10 +427,11 @@ public class ProfileCalculator {
 			}
 		}
 		readerMatrix.closer();
+		System.out.println(counterUsed+" probands of "+counterAll+" probands used for calculation of profile.");
 		
 		// write output
 		for (int i=0; i<scores.length; i++){
-			float val = scores[i];
+			float val = scores[i]/counterUsed;	//calc mean
 			// also write terms:
 			//writer.write(index2term.get(i)+"\t");	
 			writer.write(val+"\n");
