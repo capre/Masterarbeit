@@ -6,6 +6,7 @@ public class Annotation {
 	
 	private String gene;
 	private HashMap<Integer, Float> values;
+	private HashMap<Integer, Integer> occurence; // counts, how often a term occurs (only for sum of annotations)
 	
 	
 	// create "filled" Annotation object
@@ -19,6 +20,7 @@ public class Annotation {
 	public Annotation(String gene){
 		this.gene = gene;
 		this.values = new HashMap<Integer, Float>();
+		this.occurence = new HashMap<Integer, Integer>();
 	}
 
 	
@@ -28,6 +30,9 @@ public class Annotation {
 	}
 	public HashMap<Integer, Float> getValues() {
 		return values;
+	}
+	public HashMap<Integer, Integer> getOccurence() {
+		return occurence;
 	}
 	
 	
@@ -51,10 +56,14 @@ public class Annotation {
 		
 		for(int index : a.getValues().keySet()){
 			float val = (float)0;
-			if(this.values.containsKey(index)){	// add new value
-				val = this.values.get(index);
+			int count = 0;
+			if(this.values.containsKey(index)){	
+				val = this.values.get(index);	// value so far
+				count = this.occurence.get(index);	// occurences so far
 			}
 			this.values.put(index, val+a.getValues().get(index));
+			this.occurence.put(index, count+1);
+			//System.out.println(count+" -> "+(count+1));
 		}
 		
 		return this;

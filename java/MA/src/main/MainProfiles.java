@@ -44,8 +44,8 @@ public class MainProfiles {
 		String matrixProbandsCluster = path+mode+"featProbands_scale.txt";
 		//String matrixProbandsCluster = path+mode+"featProbands_normL.txt";
 		
-		String geneGroup = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/CandidateGenes/no_candidate_genes_uniq.csv";
-		String profileForGenes = path +mode+"profile_NoCandidateGenes.txt";
+		String geneGroup = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/CandidateGenes/candidate_genes_uniq.csv";
+		String profileForGenes = path +mode+"profile_CandidateGenes.txt";
 		
 		String probandGroup = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/case_ids_study.txt"; //eg case_ids_study.txt OR control_ids_study.txt 
 		String profileForProbands = path +mode+"profile_cases.txt";
@@ -56,7 +56,7 @@ public class MainProfiles {
 		//ProfileCalculator.writeSvmMatrix(matrixProbandsIn, matrixProbandsOutSVM);
 		//ProfileCalculator.writeClusterMatrix(matrixProbandsIn, matrixProbandsCluster);
 		ProfileCalculator.writeProfileForGenes(geneGroup, profileForGenes);
-		ProfileCalculator.writeProfileForProbands(matrixProbandsIn, probandGroup, profileForProbands);
+		//ProfileCalculator.writeProfileForProbands(matrixProbandsIn, probandGroup, profileForProbands);
 		
 	}
 

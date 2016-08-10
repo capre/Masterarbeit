@@ -11,7 +11,7 @@ public class ProfileCalculator {
 	
 	
 	private static HashMap<Integer, String> index2term;		// size 88536
-	private static HashMap<String, Annotation> gene2annotation;
+	private static HashMap<String, Annotation> gene2annotation; // size 9720
 	
 	
 	/*
@@ -67,6 +67,8 @@ public class ProfileCalculator {
 		sum.addAnnotation(a1);
 		sum.addAnnotation(a2);
 		*/
+		
+
 	}
 	
 	
@@ -103,7 +105,7 @@ public class ProfileCalculator {
 	
 	
 	// OPTIONAL: get profile vector for group of genes (eg candGenes vs nonCandGenes) 
-	// output is one vector: first column=feature, second column=value OR one column=value
+	// output is one vector: first column=feature, second column=value OR one column=value OR 1st=val 2nd=occurenceOfThisTerm
 	public static void writeProfileForGenes(String geneGroup, String profileForGenes){
 		System.out.println("write profile vector for given group of genes");
 		calcProfileForGenes(geneGroup, profileForGenes);
@@ -361,12 +363,17 @@ public class ProfileCalculator {
 		
 		for(int i=0; i<index2term.size(); i++){
 			float val = (float)0;
+			int count = 0;
 			if(sum.getValues().containsKey(i)){
 				val = (sum.getValues().get(i))/counterUsed; //calc mean
+				count = sum.getOccurence().get(i);
 			}
 			// also write terms:
 			//writer.write(index2term.get(i)+"\t");	
-			writer.write(val+"\n");	
+			writer.write(val+"");	
+			// write occurence:
+			writer.write("\t"+count);
+			writer.write("\n");
 		}
 		writer.closer();
 	}
