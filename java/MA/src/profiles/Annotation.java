@@ -5,13 +5,18 @@ import java.util.HashMap;
 public class Annotation {
 	
 	private String gene;
+	private int indexOld;
+	private int indexNew;
 	private HashMap<Integer, Float> values;
-	private HashMap<Integer, Integer> occurence; // counts, how often a term occurs (only for sum of annotations)
 	
+	private HashMap<Integer, Integer> occurence; // counts, how often a term occurs (only for sum of annotations)
+
 	
 	// create "filled" Annotation object
-	public Annotation(String gene, String line){
+	public Annotation(String gene, String line, int oldIndex, int newIndex){
 		this.gene = gene;
+		this.indexOld = oldIndex;
+		this.indexNew = newIndex;
 		this.values = new HashMap<Integer, Float>();
 		fill(line);
 	}
@@ -67,6 +72,15 @@ public class Annotation {
 		}
 		
 		return this;
+	}
+
+	
+	// removes annotation value for self-association
+	public void removeSelfAssociation() {
+		int oldSize = this.values.size();
+		this.values.remove(this.indexOld);
+		int newSize = this.values.size();
+		//System.out.println(this.gene+"\t"+this.indexOld+"\t"+this.indexNew+"\t"+oldSize+"\t"+newSize);
 	}
 	
 	

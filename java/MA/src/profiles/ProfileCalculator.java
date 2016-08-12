@@ -104,9 +104,14 @@ public class ProfileCalculator {
 
 	
 	
-	// OPTIONAL: get profile vector for group of genes (eg candGenes vs nonCandGenes) 
+	// OPTIONAL: get profile vector for group of genes (eg candGenes vs nonCandGenes)
+	// first: remove self-associations from annotation vectors
 	// output is one vector: first column=feature, second column=value OR one column=value OR 1st=val 2nd=occurenceOfThisTerm
 	public static void writeProfileForGenes(String geneGroup, String profileForGenes){
+		System.out.println("remove self-associations of all genes");
+		for (String gene : gene2annotation.keySet()){
+			gene2annotation.get(gene).removeSelfAssociation();
+		}
 		System.out.println("write profile vector for given group of genes");
 		calcProfileForGenes(geneGroup, profileForGenes);
 	}
@@ -152,10 +157,18 @@ public class ProfileCalculator {
 		
 		// create and fill newIndex2gene:
 		HashMap<Integer, String> newIndex2gene = new HashMap<Integer, String>();
+		HashMap<String, Integer> gene2newIndex = new HashMap<String, Integer>();
+		HashMap<String, Integer> gene2oldIndex = new HashMap<String, Integer>();
 		String line;
 		while((line=readerGene.read())!=null){ // LAPTM4A	14084	0
 			String [] l = line.split("\t");
-			newIndex2gene.put(Integer.parseInt(l[2]), l[0]);
+			String gene = l[0];
+			int oldIndex = Integer.parseInt(l[1]);
+			int newIndex = Integer.parseInt(l[2]);
+			newIndex2gene.put(newIndex, gene);
+			gene2newIndex.put(gene, newIndex);
+			gene2oldIndex.put(gene, oldIndex);
+			
 		}
 		readerGene.closer();
 		
@@ -165,7 +178,9 @@ public class ProfileCalculator {
 		while((line=readerWeight.read())!=null){ // 26	0:0.015434295	965:0.020228693	2891:0.01403832
 			if(newIndex2gene.containsKey(counter)){
 				String gene = newIndex2gene.get(counter);
-				Annotation a = new Annotation(gene, line);
+				int oldIndex = gene2oldIndex.get(gene);
+				int newIndex = gene2newIndex.get(gene);
+				Annotation a = new Annotation(gene, line, oldIndex, newIndex);
 				gene2annotation.put(gene, a);
 			}
 			else{
