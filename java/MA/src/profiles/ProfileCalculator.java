@@ -34,10 +34,10 @@ public class ProfileCalculator {
 		/*
 		//for testing: ok
 		String line1 = "26\t0:-0.5\t1:10\t3:0.1\t6:2.5";
-		Annotation a1 = new Annotation("AB", line1);
+		Annotation a1 = new Annotation("AB", line1, 1, 1);
 		
 		String line2 = "26\t0:7\t3:10\t4:-2";
-		Annotation a2 = new Annotation("FG", line2);
+		Annotation a2 = new Annotation("FG", line2, 2, 2);
 		*/
 		/*
 		float[] scores = new float[7];
@@ -66,9 +66,32 @@ public class ProfileCalculator {
 		Annotation sum = new Annotation("sum");
 		sum.addAnnotation(a1);
 		sum.addAnnotation(a2);
-		*/
+		Annotation copy = sum.subtractAnnotation(a1); // does NOT change the sum object! but returns a copy
+		System.out.println(sum.getNumberOfAnnotations());
+		System.out.println(copy.getNumberOfAnnotations());
 		
-
+		Annotation copy2 = sum.subtractAnnotation(a2);
+		System.out.println(copy2.getNumberOfAnnotations());
+		System.out.println(sum.getNumberOfAnnotations());
+		
+		for(int i: sum.getValues().keySet()){
+			System.out.println(i+":"+sum.getValues().get(i));
+		}
+		System.out.println("###########");
+		*/
+		/*
+		Annotation.calcScalarProduct(a1, a2);
+		//System.out.println("#####");
+		//Annotation.calcScalarProduct(a2, a1);
+		System.out.println("###########");
+		
+		
+		Annotation comp1 = sum.subtractAnnotation(a1);
+		Annotation comp2 = sum;
+		Annotation.calcScalarProduct(a1, comp1);
+		System.out.println("#####");
+		Annotation.calcScalarProduct(a1, comp2);
+		*/
 	}
 	
 	
@@ -125,9 +148,18 @@ public class ProfileCalculator {
 		calcProfileForProbands(matrixProbandsIn, probandGroup, profileForProbands, ignoreNegativeCadd);
 	}
 	
+	
+	// OPTIONAL: predict genes of geneList(NO header):
+	// compare annotation to profile vector of candGenes and nonCandGenes (WITH header)
+	public static void predictGenes(String candGenes, String nonCandGenes, String geneList, String genePrediction) {
+		// TODO Auto-generated method stub
+		System.out.println("predict genes (compare annotation to cand profile and nonCand profile)");
+		calcPredictionForGenes(candGenes, nonCandGenes, geneList, genePrediction);
+		
+	}
+	
 
 	// -----------------------------------------------------------------------------
-
 
 
 
@@ -352,35 +384,18 @@ public class ProfileCalculator {
 	}
 
 	
-	// calculate profile (one vector) for the given group of genes by summing up the values for each feature
-	// then calculate mean
+	// calculate profile (one vector) for the given group of genes (WITH header) 
+	// by summing up the values for each feature; then calculate mean
 	private static void calcProfileForGenes(String geneGroup, String profileForGenes) {
-		FileInputReader reader = new FileInputReader(geneGroup);
 		FileOutputWriter writer = new FileOutputWriter(profileForGenes);
 		
-		int counterAll = 0;		//counts whole number of input genes
-		int counterUsed = 0;	//counts number of used genes --> used for calculation of mean for values
-		Annotation sum = new Annotation("GroupOfGenes");
-		String line;
-
-		while((line=reader.read())!=null){
-			if(gene2annotation.containsKey(line)){ // add values of this gene
-				sum.addAnnotation(gene2annotation.get(line));
-				counterUsed++;
-			}
-			else{
-				//System.out.println("no annotation for " + line + " available.");
-			}
-			counterAll++;
-		}
-		reader.closer();
-		System.out.println(counterUsed+" genes of "+counterAll+" genes used for calculation of profile.");
+		Annotation sum = getSumAnnotationForGenes(geneGroup);
 		
 		for(int i=0; i<index2term.size(); i++){
 			float val = (float)0;
 			int count = 0;
 			if(sum.getValues().containsKey(i)){
-				val = (sum.getValues().get(i))/counterUsed; //calc mean
+				val = (sum.getValues().get(i))/sum.getNumberOfAnnotations(); //calc mean
 				count = sum.getOccurence().get(i);
 			}
 			// also write terms:
@@ -460,6 +475,102 @@ public class ProfileCalculator {
 		}
 		writer.closer();	
 	}
+
+
+
+
+	// calc prediction for each gene in geneList (NO header)
+	// by comparing their annotation to the profile vector of candGenes and nonCandGenes (WITH header)
+	private static void calcPredictionForGenes(String candGenes, String nonCandGenes, String geneList, String genePrediction) {
+		FileInputReader reader = new FileInputReader(geneList);
+		FileOutputWriter writer = new FileOutputWriter(genePrediction);
+		
+		// calc sum of annotations for candGenes and nonCandGenes:
+		Annotation cand = getSumAnnotationForGenes(candGenes);
+		Annotation nonCand = getSumAnnotationForGenes(nonCandGenes);
+		
+		//go through geneList:
+		// - check if annotation is available for this gene
+		// - subtract annotation from a copy of the profile vector, it was originally added to
+		// - calc scalar product of annotation to both profile vectors
+		// - calc means of scalar products
+		// - compare
+		
+		// annotation objects for comparison (do not contain annotation for actual gene)
+		Annotation candComp = cand;	
+		Annotation nonCandComp = nonCand;
+		
+		String line;
+		while((line=reader.read())!=null){
+			// if no Annotation available -> go to next line
+			if(!gene2annotation.containsKey(line)){
+				//System.out.println("No annotation available for "+ line);
+				continue;
+			}
+				
+			Annotation actAnn = gene2annotation.get(line);
+			
+			//check, if this gene was used in cand profile vector OR nonCand profile vector
+			if(cand.getGenes().contains(line)){
+				candComp = cand.subtractAnnotation(actAnn);
+				nonCandComp = nonCand;
+			}
+			else if(nonCand.getGenes().contains(line)){
+				candComp = cand;	
+				nonCandComp = nonCand.subtractAnnotation(actAnn);
+			}
+			else{System.out.println("Warning: "+line+" was used twice (for both profiles).");}
+			
+			//calc scalar product of annotation to both profile vectors
+			float scalarCand = Annotation.calcScalarProduct(actAnn, candComp);
+			float scalarNonCand = Annotation.calcScalarProduct(actAnn, nonCandComp);
+			
+			//calc means of scalar products
+			scalarCand = scalarCand/candComp.getNumberOfAnnotations();
+			scalarNonCand = scalarNonCand/nonCandComp.getNumberOfAnnotations();
+			
+			//compare and write output
+			// CandGene?(T=1), gene, scalarCand, scalarNonCand, prediction(cand=1)
+			if(cand.getGenes().contains(line)){writer.write("1\t");}
+			else if(nonCand.getGenes().contains(line)){writer.write("0\t");}
+			else{writer.write("NULL\t");}
+			
+			writer.write(line+"\t"+scalarCand+"\t"+scalarNonCand+"\t");
+			
+			int c = java.lang.Float.compare(scalarCand, scalarNonCand); 
+			if(c>0){writer.write("1\n");}
+			else if(c<0){writer.write("0\n");}
+			else{writer.write("NULL\n");}
+
+		}
+		reader.closer();
+		writer.closer();
+	}
+	
+	
+	//returns the sum of annotation vectors for the given geneGroup (WITH header)
+	private static Annotation getSumAnnotationForGenes(String geneGroup){
+		FileInputReader reader = new FileInputReader(geneGroup);
+		
+		int counterAll = 0;		//counts whole number of input genes
+		Annotation sum = new Annotation("GroupOfGenes");
+		String line=reader.read(); //ignore header
+
+		while((line=reader.read())!=null){
+			if(gene2annotation.containsKey(line)){ // add values of this gene
+				sum.addAnnotation(gene2annotation.get(line));
+			}
+			else{
+				//System.out.println("no annotation for " + line + " available.");
+			}
+			counterAll++;
+		}
+		reader.closer();
+		System.out.println(sum.getNumberOfAnnotations()+" genes of "+counterAll+" genes used for calculation of profile.");
+		
+		return sum;
+	}
+	
 	
 
 }

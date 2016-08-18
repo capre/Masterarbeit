@@ -100,10 +100,18 @@ public class ProfileGenerator {
 	
 	// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: feat.txt)
 	public static void writeClusterMatrix(String clusterMatrix){
-		System.out.println("write matrix for hierarchical clustering");
-		createClusterMatrix(clusterMatrix); //ok
+		System.out.println("write matrix for hierarchical clustering (without colour-coding)");
+		boolean colouring = false;
+		createClusterMatrix(clusterMatrix, "", colouring); //ok
 	}
-	
+	// OPTIONAL: create matrix for hierarchical clustering (= write output of svmclust.pl: feat.txt)
+	// use candGenes for color coding in tree (cand->1; nonCand->0)
+	public static void writeClusterMatrix(String clusterMatrix, String candGenes){
+		System.out.println("write matrix for hierarchical clustering (with colour-coding)");
+		String clusterMatrix2 = clusterMatrix.replace(".txt", "_color.txt");
+		boolean colouring = true;
+		createClusterMatrix(clusterMatrix2, candGenes, colouring); //ok
+	}
 	
 
 	//-----------------------------------------------------------------------
@@ -303,8 +311,20 @@ public class ProfileGenerator {
 	// OPTIONAL
 	// create matrix for hierarchical clustering of genes based on their annotation/ their feature values
 	// (= write output of svmclust.pl: feat.txt)
-	private static void createClusterMatrix(String clusterMatrix) {
+	// candGenes is only used, if colouring=true (cand->1; nonCand->0)
+	private static void createClusterMatrix(String clusterMatrix, String candGenes, boolean colouring) {
 		FileOutputWriter writer = new FileOutputWriter(clusterMatrix);
+		
+		//in case of colouring : read candGenes
+		HashSet<String> candSet = new HashSet<String>();
+		if(colouring){
+			FileInputReader reader = new FileInputReader(candGenes);
+			String line;
+			while((line=reader.read())!=null){
+				candSet.add(line);
+			}
+			reader.closer();
+		}
 		
 		// write header
 		writer.write("UID\tNAME\tGWEIGHT");
@@ -329,6 +349,15 @@ public class ProfileGenerator {
 		// write actual matrix with feature values for genes
 		for (ByteLine bl : lines) {
 			String g = bl.getGene();
+			if(colouring){
+				if(candSet.contains(g)){
+					g = "1_"+g;
+				}
+				else{
+					g = "0_"+g;
+				}
+			}
+			//System.out.println(g);
 			writer.write(g+"\t"+g+"\t1");
             bl.writeComplete(writer, index2term.size());
         }
