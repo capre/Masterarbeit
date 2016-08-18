@@ -8,8 +8,11 @@ public class MainProfiles {
 	public static void main(String[] args) {
 		
 		//candGenes, nonCandGenes: WITH header
-		String candGenes = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/CandidateGenes/candidate_genes_uniq.csv";
-		String nonCandGenes = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/CandidateGenes/no_candidate_genes_uniq.csv";
+		String pathCand = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/CandidateGenes/";
+		//String candGenes = pathCand + "candidate_genes_uniq.csv";
+		//String nonCandGenes = pathCand  +"no_candidate_genes_uniq.csv";
+		String candGenes = pathCand + "candidate_genes_uniq_3.csv";
+		String nonCandGenes = pathCand  +"no_candidate_genes_uniq_3.csv";
 		
 		//String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/ProfileAnalysis/";
 		String path = "D:/MA_data/Dataset_2_part/ProfileAnalysis/";
@@ -17,8 +20,9 @@ public class MainProfiles {
 		//String pathProbands = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
 		String pathProbands = "D:/MA_data/Dataset_2_part/Files/";
 		
-		String mode = "noNorm/"; 
 		// use noNorm/ (all genes) OR normL/ (genes with length, for Cadd-score normalisation) OR clusterCandGenes/
+		String mode = "noNorm/"; 
+		
 		
 		
 		//input
@@ -56,12 +60,12 @@ public class MainProfiles {
 		//String matrixProbandsCluster = path+mode+"featProbands_normL.txt";
 		
 		String geneGroup = candGenes; // WITH header (ignored) eg candGenes OR nonCandGenes
-		String profileForGenes = path +mode+"profile_CandidateGenes.txt";
+		String profileForGenes = path +mode+"results/profile_CandidateGenes.txt";
 		
 		String probandGroup = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/case_ids_study.txt"; //eg case_ids_study.txt OR control_ids_study.txt 
-		String profileForProbands = path +mode+"profile_cases.txt";
+		String profileForProbands = path +mode+"results/profile_cases.txt";
 		
-		String genePrediction = path +mode+"genePrediction.txt";
+		String genePrediction = path +mode+"results/genePrediction_3.txt";
 		
 		
 		// generate a matrix of probands "annotated" by features of profiles
