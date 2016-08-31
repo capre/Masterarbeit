@@ -140,7 +140,7 @@ public class ProfileGenerator {
 		FileOutputWriter writer = new FileOutputWriter(mapOut);
 		String line;
 		
-		// which terms should be ignored? eg, some genes have 2 terms... -> ignore one
+		// which terms should be ignored? eg, some genes have 2 terms... -> ignore one (explicitly defined here)
 		HashSet<String> ignore = new HashSet<String>();
 		ignore.add("cardiotrophin-like cytokine");
 		ignore.add("CAZ-associated structural protein");
@@ -148,7 +148,7 @@ public class ProfileGenerator {
 		ignore.add("p53-responsive gene 4");
 		ignore.add("receptor-interacting factor 1");
 		
-		// use copy of geneSet and remove genes already found
+		// use copy of geneSet and remove genes already found --> ignore 2nd occurence of a gene
 		HashSet<String> geneSetCopy = new HashSet<String>();
 		geneSetCopy.addAll(geneSet);
 		
