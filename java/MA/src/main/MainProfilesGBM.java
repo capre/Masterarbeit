@@ -7,28 +7,28 @@ public class MainProfilesGBM {
 
 	public static void main(String[] args) {
 		
-		// TODO candGenes, nonCandGenes: WITH header
-		//String pathCand = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/CandidateGenes/";
-		//String candGenes = pathCand + "candidate_genes_uniq.csv";
-		//String nonCandGenes = pathCand  +"no_candidate_genes_uniq.csv";
+		// candGenes, nonCandGenes: WITH header
+		String pathCand = "D:/MA_data/Glioblastoma/";
+		String candGenes = pathCand + "Cand.txt";
+		String nonCandGenes = pathCand  +"nonCand.txt";
 
 		
 		//TODO String pathProfileIn = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/ProfileAnalysis/";
 		String pathProfileIn = "D:/MA_data/Dataset_2_part/ProfileAnalysis/";
 		
-		String pathProfileOut = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Glioblastoma/ProfileAnalysis/";
+		String pathProfileOut = "D:/MA_data/Glioblastoma/ProfileAnalysis/";
 		
 		//TODO String pathProbands = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
-		String pathProbands = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Glioblastoma/data/";
+		String pathProbands = "D:/MA_data/Glioblastoma/data/";
 		
 		//use all/ (all genes) OR 100CADD/ (100 best CADD genes) OR 200Trans/ (200 best genes for Transcripts)
-		String mode = "100CADD/"; 
+		String mode = "all/"; 
 		
 		
 		
 		//input
-		//String geneList = pathProbands+"SVM_GBM.name";
-		String geneList = pathProbands+"100_feature_genes_CADD_sum_score.txt";
+		String geneList = pathProbands+"SVM_GBM.name";
+		//String geneList = pathProbands+"100_feature_genes_CADD_sum_score.txt";
 		
 		String mapIn = pathProfileIn+"profiles/dbset.map";
 		String termIn = pathProfileIn+"profiles/dbset.term";
@@ -59,8 +59,8 @@ public class MainProfilesGBM {
 		String matrixProbandsCluster = pathProfileOut+mode+"featProbands.txt";
 		
 		
-		// TODO String geneGroup = candGenes; // WITH header (ignored) eg candGenes OR nonCandGenes
-		//String profileForGenes = pathProfileOut +mode+"results/profile_CandidateGenes.txt";
+		String geneGroup = candGenes; // WITH header (ignored) eg candGenes OR nonCandGenes
+		String profileForGenes = pathProfileOut +mode+"results/profile_CandidateGenes.txt";
 		
 		String probandGroup = pathProbands+"ids_control.txt"; //eg ids_case.txt OR ids_control.txt 
 		String profileForProbands = pathProfileOut +mode+"results/profile_control.txt";
@@ -77,8 +77,8 @@ public class MainProfilesGBM {
 		
 		//ProfileCalculator.writeProfileForProbands(matrixProbandsIn, probandGroup, profileForProbands);
 		
-		//TODO predict gene: candGene or nonCandGene?
-		//ProfileCalculator.predictGenes(candGenes, nonCandGenes, geneList, genePrediction);
+		//predict gene: candGene or nonCandGene?
+		ProfileCalculator.predictGenes(candGenes, nonCandGenes, geneList, genePrediction);
 		
 		//removes self-associations of genes first! --> annotations without self-associations afterwards!
 		//ProfileCalculator.writeProfileForGenes(geneGroup, profileForGenes);
