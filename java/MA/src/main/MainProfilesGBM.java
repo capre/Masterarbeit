@@ -8,18 +8,20 @@ public class MainProfilesGBM {
 	public static void main(String[] args) {
 		
 		// candGenes, nonCandGenes: WITH header
-		String pathCand = "D:/MA_data/Glioblastoma/";
+		//String pathCand = "D:/MA_data/Glioblastoma/";
+		String pathCand = "/storageNGS/ngs3/projects/other/Schizo_SVM/Glioblastoma/";
 		String candGenes = pathCand + "Cand.txt";
 		String nonCandGenes = pathCand  +"nonCand.txt";
 
 		
-		//TODO String pathProfileIn = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/ProfileAnalysis/";
-		String pathProfileIn = "D:/MA_data/Dataset_2_part/ProfileAnalysis/";
+		String pathProfileIn = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/ProfileAnalysis/";
+		//String pathProfileIn = "D:/MA_data/Dataset_2_part/ProfileAnalysis/";
 		
-		String pathProfileOut = "D:/MA_data/Glioblastoma/ProfileAnalysis/";
+		String pathProfileOut = "/storageNGS/ngs3/projects/other/Schizo_SVM/Glioblastoma/ProfileAnalysis/";
+		//String pathProfileOut = "D:/MA_data/Glioblastoma/ProfileAnalysis/";
 		
-		//TODO String pathProbands = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
-		String pathProbands = "D:/MA_data/Glioblastoma/data/";
+		String pathProbands = "/storageNGS/ngs3/projects/other/Schizo_SVM/Glioblastoma/data/";
+		//String pathProbands = "D:/MA_data/Glioblastoma/data/";
 		
 		//use all/ (all genes) OR 100CADD/ (100 best CADD genes) OR 200Trans/ (200 best genes for Transcripts)
 		String mode = "all/"; 
@@ -27,7 +29,7 @@ public class MainProfilesGBM {
 		
 		
 		//input
-		String geneList = pathProbands+"SVM_GBM.name";
+		String geneList = pathProbands+"SVMmatrices/SVM_GBM.name";
 		//String geneList = pathProbands+"100_feature_genes_CADD_sum_score.txt";
 		
 		String mapIn = pathProfileIn+"profiles/dbset.map";
@@ -47,12 +49,12 @@ public class MainProfilesGBM {
 		//ProfileGenerator.run(geneList,mapIn,termIn,weightIn, mapOut,termOut,weigthOut,geneListProfiles,infoOut);
 		//TODO ProfileGenerator.writeViscoveryMatrix(weigthOutComplete);
 		//ProfileGenerator.writeClusterMatrix(clusterMatrix);
-		//TODO ProfileGenerator.writeClusterMatrix(clusterMatrix, candGenes); // candGenes for color coding in tree
+		//ProfileGenerator.writeClusterMatrix(clusterMatrix, candGenes); // output: clusterMatrix_color.txt (candGenes for color coding in tree)
 		
 		
 		//-------------------------------------------------------------------------
 		
-		
+		// TODO anpassen auf /storage .. stimmt evtl nicht ganz
 		String matrixProbandsIn = pathProbands+"GBM.txt";
 		String matrixProbandsOut = pathProfileOut+mode+"GBM_profile.txt";
 		String matrixProbandsOutSVM = pathProfileOut+mode+"SVM_GBM_profile.txt";
@@ -72,13 +74,13 @@ public class MainProfilesGBM {
 		ProfileCalculator.run(termIn,weigthOut,geneListProfiles);
 		
 		//ProfileCalculator.writeViscoveryMatrix(matrixProbandsIn, matrixProbandsOut);
-		//ProfileCalculator.writeSvmMatrix(matrixProbandsIn, matrixProbandsOutSVM);
-		//ProfileCalculator.writeClusterMatrix(matrixProbandsIn, matrixProbandsCluster);
+		ProfileCalculator.writeSvmMatrix(matrixProbandsIn, matrixProbandsOutSVM);
+		ProfileCalculator.writeClusterMatrix(matrixProbandsIn, matrixProbandsCluster);
 		
 		//ProfileCalculator.writeProfileForProbands(matrixProbandsIn, probandGroup, profileForProbands);
 		
 		//predict gene: candGene or nonCandGene?
-		ProfileCalculator.predictGenes(candGenes, nonCandGenes, geneList, genePrediction);
+		//ProfileCalculator.predictGenes(candGenes, nonCandGenes, geneList, genePrediction);
 		
 		//removes self-associations of genes first! --> annotations without self-associations afterwards!
 		//ProfileCalculator.writeProfileForGenes(geneGroup, profileForGenes);
