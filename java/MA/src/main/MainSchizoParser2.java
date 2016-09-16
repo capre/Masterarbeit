@@ -25,7 +25,7 @@ public class MainSchizoParser2 {
 		 * 7: mergeViscoveryMatrices
 		 */
 		args=new String[1];
-		args[0]="createInputSVM";
+		args[0]="";
 		
 		
 		if(args.length==0){
@@ -171,10 +171,13 @@ public class MainSchizoParser2 {
 			else if(args[0].equals("scaleViscovery")){
 				//String path = "C:/Users/Carolin/Documents/Studium/2_Master/Masterarbeit/Data/Schizophrenie/Dataset_2/Files/";
 				//String path = "/home/ibis/carolin.prexler/Documents/Dataset_2/";
-				String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
+				//String path = "/storageNGS/ngs3/projects/other/Schizo_SVM/Schizo_data/Dataset_2/";
+				String path = "D:/MA_data/Glioblastoma/data/";
 				
-				String pathIn = path+"gt_all/!Matrix_gt.txt";
-				String pathOut = path+"gt_all/!Matrix_gt_scale.txt"; 
+				//String pathIn = path+"gt_all/!Matrix_gt.txt";
+				//String pathOut = path+"gt_all/!Matrix_gt_scale.txt"; 
+				String pathIn = path+"GBM.txt";
+				String pathOut = path+"GBM_scale.txt"; 
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
