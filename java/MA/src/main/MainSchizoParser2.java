@@ -25,7 +25,7 @@ public class MainSchizoParser2 {
 		 * 7: mergeViscoveryMatrices
 		 */
 		args=new String[1];
-		args[0]="";
+		args[0]="scaleViscovery";
 		
 		
 		if(args.length==0){
@@ -176,8 +176,8 @@ public class MainSchizoParser2 {
 				
 				//String pathIn = path+"gt_all/!Matrix_gt.txt";
 				//String pathOut = path+"gt_all/!Matrix_gt_scale.txt"; 
-				String pathIn = path+"GBM.txt";
-				String pathOut = path+"GBM_scale.txt"; 
+				String pathIn = path+"GBM_nonEmpty.txt";
+				String pathOut = path+"GBM_nonEmpty_scale.txt"; 
 				if(args.length>1){ //set files
 					path = args[1];
 					pathIn = path+args[2];
